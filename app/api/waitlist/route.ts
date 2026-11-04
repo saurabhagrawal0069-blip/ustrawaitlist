@@ -85,13 +85,11 @@ export async function POST(request: Request) {
       return bad('Too many registrations from this network. Please try again later.', 429);
     }
 
-    const table = kind === 'customer' ? 'customers' : 'businesses';
     const phone = `+${phoneDigits}`;
-    const payload = kind === 'customer'
-      ? { full_name: name, phone, email: email || null, city, locality: locality || null, services, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash }
-      : { owner_name: name, phone, email: email || null, city, locality: locality || null, business_name: businessName, business_type: businessType, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash };
-
-    const { data, error } = await supabase.from(table).insert(payload).select('id, waitlist_number').single();
+    // One insert per table, so TypeScript checks each row against its own columns.
+    const { data, error } = kind === 'customer'
+      ? await supabase.from('customers').insert({ full_name: name, phone, email: email || null, city, locality: locality || null, services, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash }).select('id, waitlist_number').single()
+      : await supabase.from('businesses').insert({ owner_name: name, phone, email: email || null, city, locality: locality || null, business_name: businessName, business_type: businessType, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash }).select('id, waitlist_number').single();
     if (error) {
       if (error.code === '23505') return bad('This mobile number is already registered for this waitlist.', 409);
       console.error('Supabase registration error:', error);

@@ -18,14 +18,16 @@ This is the first working foundation, not a fully deployed production service. T
 1. Install Node.js 20 or later.
 2. In this folder run `npm install`.
 3. Copy `.env.example` to `.env.local` and fill in the Supabase values.
-4. In Supabase SQL Editor, run `supabase/schema.sql`.
+4. In Supabase SQL Editor, run `supabase/schema.sql` (it is safe to run again).
 5. Run `npm run dev` and open `http://localhost:3000`.
 
 ## Environment variables
-See `.env.example`. Never put `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, or WhatsApp access tokens in client-side code or expose them with a `NEXT_PUBLIC_` prefix.
+See `.env.example`. Never put `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `IP_HASH_SALT`, or WhatsApp access tokens in client-side code or expose them with a `NEXT_PUBLIC_` prefix. `IP_HASH_SALT` is required: the registration API refuses requests without it.
 
 ## Registration rules
 Mobile numbers are stored with their country code. A 10-digit number is treated as Indian (+91), and each number can register only once per waitlist. Email and WhatsApp consent boxes are unchecked by default, so people must opt in themselves.
+
+To limit spam, one network (IP address) can make at most 10 registrations per hour across both forms. Only a salted hash of the IP address is stored. On Vercel the visitor IP is read from the platform; on other hosts, make sure the host forwards the real visitor IP.
 
 ## WhatsApp template setup
 Create and get approval for two WhatsApp Business Platform templates (one for customers and one for businesses). Set their names in `WHATSAPP_TEMPLATE_CUSTOMER` and `WHATSAPP_TEMPLATE_BUSINESS`, and their language code in `WHATSAPP_TEMPLATE_LANGUAGE` (default `en`). The API route sends four body parameters in this order: name, waitlist ID, position, city. No code changes are needed if your approved templates use these settings.

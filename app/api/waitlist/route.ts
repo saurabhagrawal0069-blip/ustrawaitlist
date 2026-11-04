@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { renderEmail, type EmailKind } from '@/lib/emailTemplates';
 
 export const runtime = 'nodejs';
 
@@ -111,10 +112,14 @@ export async function POST(request: Request) {
   }
 }
 
-async function sendEmail({ kind, name, email, id, position, city }: { kind: string; name: string; email: string; id: string; position: number; city: string }) {
+async function sendEmail({ kind, name, email, id, position, city }: { kind: EmailKind; name: string; email: string; id: string; position: number; city: string }) {
   if (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM) return 'email_skipped';
-  const subject = kind === 'customer' ? 'Welcome to USTRA — you are on the waitlist!' : 'Welcome to USTRA Business Club — registration received!';
-  const html = `<div style="background:#090909;color:#f7f2e8;padding:36px;font-family:Arial,sans-serif"><div style="max-width:560px;margin:auto;border:1px solid #b98728;padding:32px"><div style="color:#eeb52f;font-size:13px;letter-spacing:4px">USTRA · YOUR STYLE. OUR PRIORITY.</div><h1 style="font-size:30px">Welcome, ${escapeHtml(name)}.</h1><p>Your ${kind} waitlist registration is successful. We are glad to have you with us.</p><div style="background:#171717;padding:20px;margin:24px 0"><p style="color:#d7a52e">YOUR WAITLIST DETAILS</p><p><b>ID:</b> ${id}</p><p><b>Position:</b> #${position}</p><p><b>City:</b> ${escapeHtml(city)}</p><p><b>Status:</b> Registered</p></div><p>We will keep you updated as USTRA gets ready to launch.</p><p style="color:#d7a52e">Your Style. Our Priority.<br/>Team USTRA</p></div></div>`;
+  const { subject, html } = renderEmail(kind, {
+    Customer_Name: name,
+    Waitlist_ID: id,
+    Waitlist_Position: String(position),
+    City: city,
+  });
   const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: process.env.EMAIL_FROM, to: [email], subject, html }) });
   if (!response.ok) throw new Error(`Resend error: ${await response.text()}`);
   return 'sent_email';
@@ -131,4 +136,3 @@ async function sendWhatsApp({ kind, name, to, id, position, city }: { kind: stri
   return 'sent_whatsapp';
 }
 
-function escapeHtml(value: string) { return value.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c)); }

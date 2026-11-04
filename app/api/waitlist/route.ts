@@ -1,6 +1,5 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createHash } from 'node:crypto';
 
 export const runtime = 'nodejs';
 
@@ -26,17 +25,19 @@ function normalizePhone(raw: string): string | null {
   return digits;
 }
 
-// Returns a salted hash of the sender's IP address. The raw IP is never stored.
-function hashClientIp(request: NextRequest, salt: string): string {
+// Returns a salted SHA-256 hash of the sender's IP address. The raw IP is never stored.
+// On Cloudflare the real visitor IP arrives in the CF-Connecting-IP header.
+async function hashClientIp(request: Request, salt: string): Promise<string> {
   const ip =
-    request.ip ||
+    request.headers.get('cf-connecting-ip') ||
     request.headers.get('x-real-ip') ||
     request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() ||
     'unknown';
-  return createHash('sha256').update(`${salt}:${ip}`).digest('hex');
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt}:${ip}`));
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const body = await request.json();
     const kind = body?.kind;
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
 
     // Rate limit: count this network's recent registrations across both tables.
-    const ipHash = hashClientIp(request, ipSalt);
+    const ipHash = await hashClientIp(request, ipSalt);
     const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     const [recentCustomers, recentBusinesses] = await Promise.all([
       supabase.from('customers').select('id', { count: 'exact', head: true }).eq('signup_ip_hash', ipHash).gte('created_at', since),

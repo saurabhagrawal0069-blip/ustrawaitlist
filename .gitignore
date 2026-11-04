@@ -5,3 +5,6 @@ out/
 .env*.local
 *.tsbuildinfo
 .DS_Store
+.open-next/
+.wrangler/
+.dev.vars

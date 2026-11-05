@@ -6,3 +6,54 @@
 @media(max-width:800px){.offer-slide{flex-direction:column;align-items:flex-start;padding:22px}.offer-cta{width:100%}}
 @media(max-width:520px){.offer-text h3{font-size:26px}.offer-slide{gap:16px}}
 @media(prefers-reduced-motion:reduce){.offer-slide,.offer-dot{transition:none}}
+
+
+/* USTRA booking explainer animation */
+.booking-film{position:relative;overflow:hidden;padding:100px 0;background:radial-gradient(ellipse at 78% 50%,#3b2a0c55,transparent 42%),linear-gradient(110deg,#0c0c0b,#151108);border-bottom:1px solid #403016}
+.booking-film-inner{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:70px}
+.booking-film-copy{max-width:510px}
+.booking-film-copy h2{font:900 clamp(48px,6vw,72px)/.94 'Barlow Condensed',sans-serif;letter-spacing:-1px;margin:0;text-transform:uppercase}
+.booking-film-copy h2 em{font-style:normal;color:var(--gold)}
+.booking-film-copy>.muted{max-width:470px;margin:22px 0 26px}
+.film-scene-copy{border-left:2px solid var(--gold);padding:2px 0 2px 17px;margin:26px 0}
+.film-scene-copy>span{font-size:9px;letter-spacing:2px;color:var(--gold);font-weight:700}
+.film-scene-copy h3{font:700 25px 'Barlow Condensed';text-transform:uppercase;margin:7px 0}
+.film-scene-copy p{font-size:12px;color:#aaa397;line-height:1.7;margin:0}
+.booking-film-visual{min-height:490px;position:relative;display:grid;place-items:center}
+.film-glow{position:absolute;width:390px;height:390px;border-radius:50%;background:#d9950b16;filter:blur(45px);animation:filmGlow 5s ease-in-out infinite alternate}
+.film-phone{position:relative;z-index:1;width:min(330px,82%);padding:13px;border:1px solid #9a7026;border-radius:27px;background:#10100f;box-shadow:0 30px 90px #000b,0 0 40px #d9950b17;animation:phoneFloat 5s ease-in-out infinite}
+.film-phone-top{height:30px;display:flex;justify-content:space-between;align-items:center;padding:0 5px 10px;font:900 16px 'Barlow Condensed';letter-spacing:2px;color:#f7f3ea}
+.film-status{font:700 7px 'DM Sans';letter-spacing:1px;color:#9f987f;display:flex;align-items:center;gap:5px}
+.film-status i{width:6px;height:6px;border-radius:50%;background:#70d994;box-shadow:0 0 8px #70d994}
+.film-map{height:150px;position:relative;overflow:hidden;border-radius:15px;background-color:#25271f;background-image:linear-gradient(30deg,transparent 46%,#ffffff12 47%,#ffffff12 49%,transparent 50%),linear-gradient(120deg,transparent 45%,#ffffff12 46%,#ffffff12 48%,transparent 49%),linear-gradient(0deg,#9aa07812 1px,transparent 1px),linear-gradient(90deg,#9aa07812 1px,transparent 1px);background-size:100% 100%,100% 100%,27px 27px,27px 27px}
+.map-road{position:absolute;height:9px;background:#777967;opacity:.55;border:2px solid #a7a78b}
+.road-one{width:130%;top:47px;left:-20px;transform:rotate(-18deg)}.road-two{width:120%;top:104px;left:-20px;transform:rotate(25deg)}.road-three{width:100%;top:65px;left:65px;transform:rotate(76deg)}
+.map-pin{position:absolute;color:var(--gold);filter:drop-shadow(0 3px 4px #000);animation:pinBounce 2s ease-in-out infinite}
+.pin-one{top:28px;left:22%}.pin-two{top:76px;left:66%;animation-delay:.3s}.pin-three{top:18px;left:78%;animation-delay:.6s}
+.map-you{position:absolute;bottom:10px;left:12px;background:#111d;color:#e7d8b4;padding:5px 8px;border-radius:4px;font-size:7px;letter-spacing:1px}
+.film-phone-content{padding:16px 3px 4px}
+.film-phone-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.film-phone-heading small{display:block;color:var(--gold);font-size:7px;letter-spacing:1.3px;margin-bottom:4px}
+.film-phone-heading strong{font:700 20px 'Barlow Condensed';text-transform:uppercase}
+.film-round-icon{width:34px;height:34px;border:1px solid #6c501f;color:var(--gold);border-radius:50%;display:grid;place-items:center}
+.film-listing{display:flex;align-items:center;gap:9px;padding:10px 8px;border:1px solid #393020;border-radius:9px;background:#181711;animation:listingIn .45s ease both}
+.film-listing.second{margin-top:8px;animation-delay:.12s}
+.film-shop-icon{width:34px;height:34px;flex-shrink:0;background:#2a2416;color:var(--gold);display:grid;place-items:center;border-radius:7px}
+.film-listing>div:nth-child(2){flex:1;min-width:0}
+.film-listing strong,.film-listing small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.film-listing strong{font-size:9px;color:#eee5d3}.film-listing small{font-size:7px;color:#9e9685;margin-top:4px}
+.film-listing-mark{font-size:8px;color:var(--gold);white-space:nowrap}
+.film-confirm{margin-top:12px;padding:10px;border-radius:7px;background:#dca51d;color:#15120a;text-align:center;display:flex;align-items:center;justify-content:center;gap:7px;font-size:8px;font-weight:900;letter-spacing:1px}
+.film-floating-note{position:absolute;z-index:2;right:-8px;bottom:70px;display:flex;align-items:center;gap:9px;padding:12px 14px;background:#17150f;border:1px solid #72551e;box-shadow:0 12px 35px #0008;color:var(--gold);animation:noteFloat 4s ease-in-out infinite}
+.film-floating-note strong,.film-floating-note small{display:block}.film-floating-note strong{font-size:8px;letter-spacing:1px}.film-floating-note small{font-size:8px;color:#aaa397;margin-top:4px}
+.film-progress{position:absolute;bottom:10px;display:flex;gap:8px}
+.film-progress button{width:22px;height:4px;padding:0;border:0;border-radius:9px;background:#5b4a2a;transition:width .3s,background .3s}
+.film-progress button.active{width:42px;background:var(--gold)}
+@keyframes phoneFloat{0%,100%{transform:translateY(0) rotate(1deg)}50%{transform:translateY(-12px) rotate(-1deg)}}
+@keyframes filmGlow{from{transform:scale(.9);opacity:.55}to{transform:scale(1.1);opacity:1}}
+@keyframes pinBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes noteFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes listingIn{from{opacity:.45;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:800px){.booking-film{padding:75px 0}.booking-film-inner{grid-template-columns:1fr;gap:20px}.booking-film-copy{max-width:620px}.booking-film-visual{min-height:470px}.film-floating-note{right:0}}
+@media(max-width:520px){.booking-film-copy h2{font-size:52px}.booking-film-visual{min-height:430px}.film-phone{width:min(315px,84%)}.film-floating-note{right:-4px;bottom:55px;padding:9px}.film-progress{bottom:0}}
+@media(prefers-reduced-motion:reduce){.film-phone,.film-glow,.map-pin,.film-floating-note{animation:none}.film-listing{animation:none}}

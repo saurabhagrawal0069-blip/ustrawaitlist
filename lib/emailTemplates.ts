@@ -1,8 +1,9 @@
-// Waitlist confirmation emails.
+// Waitlist confirmation emails, in English and Hindi.
 // Placeholders you can use in the subject and body:
 //   {{Customer_Name}}, {{Waitlist_ID}}, {{Waitlist_Position}}, {{City}}
 
 export type EmailKind = 'customer' | 'business';
+export type EmailLanguage = 'en' | 'hi';
 
 export type EmailValues = {
   Customer_Name: string;
@@ -11,45 +12,99 @@ export type EmailValues = {
   City: string;
 };
 
-const SUBJECTS: Record<EmailKind, string> = {
-  customer: 'Welcome to USTRA, {{Customer_Name}}. You are on the waitlist!',
-  business: 'Welcome to USTRA Business Club, {{Customer_Name}}. Registration received!',
+type Copy = {
+  subject: string;
+  brand: string;
+  greeting: string;
+  intro: string;
+  detailsTitle: string;
+  labels: { id: string; position: string; city: string; status: string };
+  statusValue: string;
+  update: string;
+  tagline: string;
+  signature: string;
 };
 
-const BODIES: Record<EmailKind, string> = {
-  customer:
-    '<div style="background:#090909;color:#f7f2e8;padding:36px;font-family:Arial,sans-serif">' +
-    '<div style="max-width:560px;margin:auto;border:1px solid #b98728;padding:32px">' +
-    '<div style="color:#eeb52f;font-size:13px;letter-spacing:4px">USTRA · YOUR STYLE. OUR PRIORITY.</div>' +
-    '<h1 style="font-size:30px;margin:20px 0 8px">Welcome, {{Customer_Name}}.</h1>' +
-    '<p>Your customer waitlist registration is successful. We are glad to have you with us.</p>' +
-    '<div style="background:#171717;padding:20px;margin:24px 0">' +
-    '<p style="color:#d7a52e;margin:0 0 12px">YOUR WAITLIST DETAILS</p>' +
-    '<p><b>ID:</b> {{Waitlist_ID}}</p>' +
-    '<p><b>Position:</b> #{{Waitlist_Position}}</p>' +
-    '<p><b>City:</b> {{City}}</p>' +
-    '<p><b>Status:</b> Registered</p>' +
-    '</div>' +
-    '<p>We will keep you updated as USTRA gets ready to launch in your city.</p>' +
-    '<p style="color:#d7a52e">Your Style. Our Priority.<br/>Team USTRA</p>' +
-    '</div></div>',
-  business:
-    '<div style="background:#090909;color:#f7f2e8;padding:36px;font-family:Arial,sans-serif">' +
-    '<div style="max-width:560px;margin:auto;border:1px solid #b98728;padding:32px">' +
-    '<div style="color:#eeb52f;font-size:13px;letter-spacing:4px">USTRA · YOUR STYLE. OUR PRIORITY.</div>' +
-    '<h1 style="font-size:30px;margin:20px 0 8px">Welcome, {{Customer_Name}}.</h1>' +
-    '<p>Your business waitlist registration is successful. We are glad to have you with us.</p>' +
-    '<div style="background:#171717;padding:20px;margin:24px 0">' +
-    '<p style="color:#d7a52e;margin:0 0 12px">YOUR WAITLIST DETAILS</p>' +
-    '<p><b>ID:</b> {{Waitlist_ID}}</p>' +
-    '<p><b>Position:</b> #{{Waitlist_Position}}</p>' +
-    '<p><b>City:</b> {{City}}</p>' +
-    '<p><b>Status:</b> Registered</p>' +
-    '</div>' +
-    '<p>We will keep you updated as USTRA gets ready to launch in your city.</p>' +
-    '<p style="color:#d7a52e">Your Style. Our Priority.<br/>Team USTRA</p>' +
-    '</div></div>',
+const COPY: Record<EmailLanguage, Record<EmailKind, Copy>> = {
+  en: {
+    customer: {
+      subject: 'Welcome to USTRA, {{Customer_Name}}. You are on the waitlist!',
+      brand: 'USTRA · YOUR STYLE. OUR PRIORITY.',
+      greeting: 'Welcome, {{Customer_Name}}.',
+      intro: 'Your customer waitlist registration is successful. We are glad to have you with us.',
+      detailsTitle: 'YOUR WAITLIST DETAILS',
+      labels: { id: 'ID', position: 'Position', city: 'City', status: 'Status' },
+      statusValue: 'Registered',
+      update: 'We will keep you updated as USTRA gets ready to launch in your city.',
+      tagline: 'Your Style. Our Priority.',
+      signature: 'Team USTRA',
+    },
+    business: {
+      subject: 'Welcome to USTRA Business Club, {{Customer_Name}}. Registration received!',
+      brand: 'USTRA · YOUR STYLE. OUR PRIORITY.',
+      greeting: 'Welcome, {{Customer_Name}}.',
+      intro: 'Your business waitlist registration is successful. We are glad to have you with us.',
+      detailsTitle: 'YOUR WAITLIST DETAILS',
+      labels: { id: 'ID', position: 'Position', city: 'City', status: 'Status' },
+      statusValue: 'Registered',
+      update: 'We will keep you updated as USTRA gets ready to launch in your city.',
+      tagline: 'Your Style. Our Priority.',
+      signature: 'Team USTRA',
+    },
+  },
+  hi: {
+    customer: {
+      subject: 'USTRA में स्वागत है, {{Customer_Name}}। आप वेटलिस्ट में शामिल हो गए हैं!',
+      brand: 'USTRA · आपका स्टाइल। हमारी प्राथमिकता।',
+      greeting: 'नमस्ते, {{Customer_Name}}।',
+      intro: 'आपका ग्राहक वेटलिस्ट रजिस्ट्रेशन सफल हो गया है। आपको हमारे साथ देखकर हमें खुशी है।',
+      detailsTitle: 'आपकी वेटलिस्ट जानकारी',
+      labels: { id: 'ID', position: 'स्थिति', city: 'शहर', status: 'स्टेटस' },
+      statusValue: 'रजिस्टर हो गया',
+      update: 'USTRA आपके शहर में लॉन्च की तैयारी कर रहा है। हम आपको हर अपडेट देते रहेंगे।',
+      tagline: 'आपका स्टाइल। हमारी प्राथमिकता।',
+      signature: 'टीम USTRA',
+    },
+    business: {
+      subject: 'USTRA बिज़नेस क्लब में स्वागत है, {{Customer_Name}}। रजिस्ट्रेशन प्राप्त हुआ!',
+      brand: 'USTRA · आपका स्टाइल। हमारी प्राथमिकता।',
+      greeting: 'नमस्ते, {{Customer_Name}}।',
+      intro: 'आपका बिज़नेस वेटलिस्ट रजिस्ट्रेशन सफल हो गया है। आपको हमारे साथ देखकर हमें खुशी है।',
+      detailsTitle: 'आपकी वेटलिस्ट जानकारी',
+      labels: { id: 'ID', position: 'स्थिति', city: 'शहर', status: 'स्टेटस' },
+      statusValue: 'रजिस्टर हो गया',
+      update: 'USTRA आपके शहर में लॉन्च की तैयारी कर रहा है। हम आपको हर अपडेट देते रहेंगे।',
+      tagline: 'आपका स्टाइल। हमारी प्राथमिकता।',
+      signature: 'टीम USTRA',
+    },
+  },
 };
+
+// Anything other than 'hi' falls back to English.
+export function normalizeLanguage(value: unknown): EmailLanguage {
+  return value === 'hi' ? 'hi' : 'en';
+}
+
+function buildBody(c: Copy, language: EmailLanguage): string {
+  const font = language === 'hi' ? "'Noto Sans Devanagari',Arial,sans-serif" : 'Arial,sans-serif';
+  return (
+    `<div style="background:#090909;color:#f7f2e8;padding:36px;font-family:${font}">` +
+    `<div style="max-width:560px;margin:auto;border:1px solid #b98728;padding:32px">` +
+    `<div style="color:#eeb52f;font-size:13px;letter-spacing:4px">${c.brand}</div>` +
+    `<h1 style="font-size:30px;margin:20px 0 8px">${c.greeting}</h1>` +
+    `<p>${c.intro}</p>` +
+    `<div style="background:#171717;padding:20px;margin:24px 0">` +
+    `<p style="color:#d7a52e;margin:0 0 12px">${c.detailsTitle}</p>` +
+    `<p><b>${c.labels.id}:</b> {{Waitlist_ID}}</p>` +
+    `<p><b>${c.labels.position}:</b> #{{Waitlist_Position}}</p>` +
+    `<p><b>${c.labels.city}:</b> {{City}}</p>` +
+    `<p><b>${c.labels.status}:</b> ${c.statusValue}</p>` +
+    `</div>` +
+    `<p>${c.update}</p>` +
+    `<p style="color:#d7a52e">${c.tagline}<br/>${c.signature}</p>` +
+    `</div></div>`
+  );
+}
 
 const HTML_ESCAPES: Record<string, string> = {
   '&': '&amp;',
@@ -71,9 +126,14 @@ function fill(template: string, values: EmailValues, asHtml: boolean): string {
   });
 }
 
-export function renderEmail(kind: EmailKind, values: EmailValues): { subject: string; html: string } {
+export function renderEmail(
+  kind: EmailKind,
+  values: EmailValues,
+  language: EmailLanguage = 'en',
+): { subject: string; html: string } {
+  const copy = COPY[language][kind];
   return {
-    subject: fill(SUBJECTS[kind], values, false),
-    html: fill(BODIES[kind], values, true),
+    subject: fill(copy.subject, values, false),
+    html: fill(buildBody(copy, language), values, true),
   };
 }

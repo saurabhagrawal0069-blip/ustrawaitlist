@@ -9,7 +9,7 @@ export default function WaitlistForm({ kind, onClose }: { kind: Kind; onClose: (
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ id: string; position: number } | null>(null);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', phone: '', email: '', city: '', locality: '', businessName: '', businessType: 'Barber Shop', services: [] as string[], whatsappConsent: false, emailConsent: false });
+  const [form, setForm] = useState({ name: '', phone: '', email: '', city: '', locality: '', businessName: '', businessType: 'Barber Shop', services: [] as string[], whatsappConsent: false, emailConsent: false, emailLanguage: 'en' });
   const isBusiness = kind === 'business';
   const update = (key: string, value: string | boolean) => setForm((p) => ({ ...p, [key]: value }));
   const toggleService = (s: string) => setForm((p) => ({ ...p, services: p.services.includes(s) ? p.services.filter(x => x !== s) : [...p.services, s] }));
@@ -33,6 +33,7 @@ export default function WaitlistForm({ kind, onClose }: { kind: Kind; onClose: (
     {isBusiness && <><label className="span-two">Business / salon name *<input required value={form.businessName} onChange={e=>update('businessName',e.target.value)} placeholder="Your business name"/></label><label>Business type<select value={form.businessType} onChange={e=>update('businessType',e.target.value)}><option>Barber Shop</option><option>Premium Salon</option><option>Unisex Salon</option><option>Grooming Studio</option><option>Independent Barber</option></select></label></>}
     <label>City *<input required value={form.city} onChange={e=>update('city',e.target.value)} placeholder="Your city"/></label><label>Area / locality<input value={form.locality} onChange={e=>update('locality',e.target.value)} placeholder="Neighbourhood"/></label></div>
     {!isBusiness && <div className="service-picker"><p className="label-title">What grooming services interest you?</p><div className="chips">{['Haircut','Beard styling','Shaving','Facial','Hair spa','Massage'].map(s=><button type="button" key={s} className={`chip ${form.services.includes(s)?'selected':''}`} onClick={()=>toggleService(s)}>{s}</button>)}</div></div>}
+    <div className="field-grid"><label className="span-two">Email language<select value={form.emailLanguage} onChange={e=>update('emailLanguage',e.target.value)}><option value="en">English</option><option value="hi">हिंदी (Hindi)</option></select></label></div>
     <div className="consents"><label><input type="checkbox" checked={form.emailConsent} onChange={e=>update('emailConsent',e.target.checked)}/> I agree to receive my registration confirmation and important updates by email.</label><label><input type="checkbox" checked={form.whatsappConsent} onChange={e=>update('whatsappConsent',e.target.checked)}/> I agree to receive my registration confirmation and important updates on WhatsApp.</label></div>
     {error && <p className="error">{error}</p>}
     <button className="button button-gold full" disabled={busy}>{busy ? <><LoaderCircle className="spin" size={18}/> Joining...</> : <>JOIN THE WAITLIST <ArrowRight size={18}/></>}</button>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { renderEmail, type EmailKind } from '@/lib/emailTemplates';
+import { normalizeLanguage, renderEmail, type EmailKind, type EmailLanguage } from '@/lib/emailTemplates';
 
 export const runtime = 'nodejs';
 
@@ -55,6 +55,7 @@ export async function POST(request: Request) {
       : [];
     const emailConsent = body.emailConsent === true;
     const whatsappConsent = body.whatsappConsent === true;
+    const emailLanguage = normalizeLanguage(body.emailLanguage);
 
     if (!name || !city) return bad('Please complete all required fields.');
     const phoneDigits = normalizePhone(clean(body.phone, 30));
@@ -101,7 +102,7 @@ export async function POST(request: Request) {
     const id = `${prefix}-${String(data.waitlist_number).padStart(6, '0')}`;
     // Notifications are deliberately best-effort: registration remains successful if a provider is not configured.
     const notificationResults = await Promise.allSettled([
-      emailConsent && email ? sendEmail({ kind, name, email, id, position: data.waitlist_number, city }) : Promise.resolve('email_skipped'),
+      emailConsent && email ? sendEmail({ kind, name, email, id, position: data.waitlist_number, city, language: emailLanguage }) : Promise.resolve('email_skipped'),
       whatsappConsent ? sendWhatsApp({ kind, name, to: phoneDigits, id, position: data.waitlist_number, city }) : Promise.resolve('whatsapp_skipped')
     ]);
     await supabase.from('notification_logs').insert(notificationResults.map((result, index) => ({ registration_kind: kind, registration_id: data.id, channel: index === 0 ? 'email' : 'whatsapp', status: result.status === 'fulfilled' ? String(result.value).startsWith('sent') ? 'sent' : 'skipped' : 'failed', error_message: result.status === 'rejected' ? String(result.reason).slice(0, 500) : null })));
@@ -112,14 +113,14 @@ export async function POST(request: Request) {
   }
 }
 
-async function sendEmail({ kind, name, email, id, position, city }: { kind: EmailKind; name: string; email: string; id: string; position: number; city: string }) {
+async function sendEmail({ kind, name, email, id, position, city, language }: { kind: EmailKind; name: string; email: string; id: string; position: number; city: string; language: EmailLanguage }) {
   if (!process.env.RESEND_API_KEY || !process.env.EMAIL_FROM) return 'email_skipped';
   const { subject, html } = renderEmail(kind, {
     Customer_Name: name,
     Waitlist_ID: id,
     Waitlist_Position: String(position),
     City: city,
-  });
+  }, language);
   const response = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ from: process.env.EMAIL_FROM, to: [email], subject, html }) });
   if (!response.ok) throw new Error(`Resend error: ${await response.text()}`);
   return 'sent_email';

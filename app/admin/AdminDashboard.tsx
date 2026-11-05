@@ -2,6 +2,15 @@
 
 import { useMemo, useState } from 'react';
 import LogoutButton from './LogoutButton';
+import { VIDEO_CLIPS } from '@/lib/videoClips';
+
+export type VideoStat = {
+  clipId: string;
+  viewers: number;
+  unmuted: number;
+  completed: number;
+  avgWatched: number;
+};
 
 export type CustomerRow = {
   number: string;
@@ -48,14 +57,20 @@ function Consent({ emailOk, whatsappOk }: { emailOk: boolean; whatsappOk: boolea
   );
 }
 
+const percentOf = (part: number, whole: number) => (whole > 0 ? Math.round((part * 100) / whole) : 0);
+
 export default function AdminDashboard({
   customers,
   businesses,
   loadError,
+  videoStats,
+  videoError,
 }: {
   customers: CustomerRow[];
   businesses: BusinessRow[];
   loadError: string | null;
+  videoStats: VideoStat[];
+  videoError: string | null;
 }) {
   const [tab, setTab] = useState<Tab>('customers');
   const [query, setQuery] = useState('');
@@ -317,6 +332,55 @@ export default function AdminDashboard({
           )}
         </section>
       )}
+
+      <section className="adm-panel adm-video">
+        <div className="adm-section-head">
+          <h2>Video engagement</h2>
+          <span className="adm-muted">Anonymous. Each viewer is one browser tab.</span>
+        </div>
+        {videoError ? (
+          <p className="adm-empty">Could not load video data: {videoError}</p>
+        ) : VIDEO_CLIPS.length === 0 ? (
+          <p className="adm-empty">No videos added to the waitlist page yet.</p>
+        ) : (
+          <div className="adm-table-wrap">
+            <table className="adm-table">
+              <thead>
+                <tr>
+                  <th>Video</th>
+                  <th>Viewers</th>
+                  <th>Sound on</th>
+                  <th>Finished</th>
+                  <th>Avg watched</th>
+                </tr>
+              </thead>
+              <tbody>
+                {VIDEO_CLIPS.map((clip) => {
+                  const stat = videoStats.find((s) => s.clipId === clip.id) ?? {
+                    viewers: 0,
+                    unmuted: 0,
+                    completed: 0,
+                    avgWatched: 0,
+                  };
+                  return (
+                    <tr key={clip.id}>
+                      <td className="adm-name">{clip.title}</td>
+                      <td>{stat.viewers}</td>
+                      <td>
+                        {stat.unmuted} <span className="adm-muted">({percentOf(stat.unmuted, stat.viewers)}%)</span>
+                      </td>
+                      <td>
+                        {stat.completed} <span className="adm-muted">({percentOf(stat.completed, stat.viewers)}%)</span>
+                      </td>
+                      <td>{stat.avgWatched.toFixed(1)} sec</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </>
   );
 }

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 import AdminLogin from './AdminLogin';
-import AdminDashboard, { type BusinessRow, type CustomerRow } from './AdminDashboard';
+import AdminDashboard, { type BusinessRow, type CustomerRow, type VideoStat } from './AdminDashboard';
 import { ADMIN_COOKIE, adminSessionValue, safeEqual } from '@/lib/adminAuth';
 
 export const dynamic = 'force-dynamic';
@@ -69,7 +69,7 @@ export default async function AdminPage() {
   }
 
   const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
-  const [customersRes, businessesRes] = await Promise.all([
+  const [customersRes, businessesRes, videoRes] = await Promise.all([
     supabase
       .from('customers')
       .select('waitlist_number, full_name, phone, email, city, locality, services, email_consent, whatsapp_consent, created_at')
@@ -78,7 +78,18 @@ export default async function AdminPage() {
       .from('businesses')
       .select('waitlist_number, owner_name, business_name, business_type, phone, email, city, locality, verification_status, email_consent, whatsapp_consent, created_at')
       .order('waitlist_number', { ascending: true }),
+    // Video stats come from a database function (see supabase/video_events.sql). Kept separate so a problem here never hides the signups.
+    supabase.rpc('video_clip_stats'),
   ]);
+
+  const videoStats: VideoStat[] = ((videoRes.data ?? []) as Row[]).map((v) => ({
+    clipId: String(v.clip_id),
+    viewers: Number(v.viewers ?? 0),
+    unmuted: Number(v.unmuted ?? 0),
+    completed: Number(v.completed ?? 0),
+    avgWatched: Number(v.avg_watched_seconds ?? 0),
+  }));
+  const videoError = videoRes.error?.message ?? null;
 
   const customers: CustomerRow[] = ((customersRes.data ?? []) as Row[]).map((c) => ({
     number: text(c.waitlist_number),
@@ -113,7 +124,13 @@ export default async function AdminPage() {
   return (
     <main className="adm-page">
       <div className="adm-wrap">
-        <AdminDashboard customers={customers} businesses={businesses} loadError={loadError} />
+        <AdminDashboard
+          customers={customers}
+          businesses={businesses}
+          loadError={loadError}
+          videoStats={videoStats}
+          videoError={videoError}
+        />
       </div>
     </main>
   );

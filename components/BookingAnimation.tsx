@@ -1,21 +1,72 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CalendarCheck, Check, Clock3, MapPin, Scissors, Search, Store } from 'lucide-react';
+import { CalendarCheck, Check, Clock3, MapPin, Scissors, Store, Volume2, VolumeX } from 'lucide-react';
 
 const scenes = [
-  { step: '01 / DISCOVER', title: 'Find the right salon, nearby.', copy: 'Explore trusted barbers and salons around your neighbourhood — all in one place.', tag: 'SALONS NEAR YOU', icon: MapPin },
-  { step: '02 / CHOOSE A SLOT', title: 'Your time. Your appointment.', copy: 'Compare services, choose the professional you like, and pick a time that works for you.', tag: 'PICK YOUR TIME', icon: CalendarCheck },
-  { step: '03 / YOU’RE BOOKED', title: 'Skip the wait. Enjoy your day.', copy: 'Get your appointment details and spend less time searching or waiting around.', tag: 'BOOKING CONFIRMED', icon: Check },
+  {
+    step: '01 / DISCOVER',
+    title: 'Find the right salon, nearby.',
+    copy: 'Explore trusted barbers and salons around your neighbourhood — all in one place.',
+    voice: 'USTRA पर अपने आसपास के अच्छे सैलून और बार्बर आसानी से खोजें। अब अलग-अलग जगह फोन करने या भटकने की ज़रूरत नहीं।',
+    tag: 'SALONS NEAR YOU',
+    icon: MapPin,
+  },
+  {
+    step: '02 / CHOOSE A SLOT',
+    title: 'Your time. Your appointment.',
+    copy: 'Compare services, choose the professional you like, and pick a time that works for you.',
+    voice: 'अपनी पसंद का सैलून और सर्विस चुनें। फिर अपनी सुविधा के अनुसार अपॉइंटमेंट का समय बुक करें।',
+    tag: 'PICK YOUR TIME',
+    icon: CalendarCheck,
+  },
+  {
+    step: '03 / YOU’RE BOOKED',
+    title: 'Skip the wait. Enjoy your day.',
+    copy: 'Get your appointment details and spend less time searching or waiting around.',
+    voice: 'बस, आपकी बुकिंग हो गई। अब लंबा इंतज़ार और बेवजह की भागदौड़ कम। USTRA के साथ अपना समय बचाएँ और बेफिक्र रहें।',
+    tag: 'BOOKING CONFIRMED',
+    icon: Check,
+  },
 ];
 
 export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
   const [active, setActive] = useState(0);
+  const [voiceOn, setVoiceOn] = useState(false);
 
   useEffect(() => {
+    if (voiceOn) return;
     const timer = window.setInterval(() => setActive((current) => (current + 1) % scenes.length), 3800);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [voiceOn]);
+
+  useEffect(() => {
+    if (!voiceOn) {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      return;
+    }
+    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+      setVoiceOn(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(scenes[active].voice);
+    utterance.lang = 'hi-IN';
+    utterance.rate = 0.92;
+    utterance.pitch = 1;
+    let nextTimer: number | undefined;
+    utterance.onend = () => {
+      nextTimer = window.setTimeout(() => setActive((current) => (current + 1) % scenes.length), 450);
+    };
+    utterance.onerror = () => setVoiceOn(false);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+
+    return () => {
+      if (nextTimer !== undefined) window.clearTimeout(nextTimer);
+      window.speechSynthesis.cancel();
+    };
+  }, [active, voiceOn]);
 
   const scene = scenes[active];
   const SceneIcon = scene.icon;
@@ -32,7 +83,19 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
             <h3>{scene.title}</h3>
             <p>{scene.copy}</p>
           </div>
-          <button className="button button-gold" onClick={onJoin}>JOIN THE WAITLIST <span aria-hidden="true">→</span></button>
+          <div className="film-actions">
+            <button className="button button-gold" onClick={onJoin}>JOIN THE WAITLIST <span aria-hidden="true">→</span></button>
+            <button
+              className="film-voice-button"
+              type="button"
+              aria-pressed={voiceOn}
+              onClick={() => setVoiceOn((enabled) => !enabled)}
+            >
+              {voiceOn ? <VolumeX size={17} /> : <Volume2 size={17} />}
+              {voiceOn ? 'आवाज़ बंद करें' : 'हिंदी में सुनें'}
+            </button>
+          </div>
+          <p className="film-voice-hint">आवाज़ सुनने के लिए बटन दबाएँ।</p>
         </div>
 
         <div className="booking-film-visual">

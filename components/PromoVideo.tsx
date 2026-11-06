@@ -103,7 +103,7 @@ export default function PromoVideo() {
   return (
     <video
       ref={ref}
-      src="/promo.mp4"
+      src="/ustra-promo-9x16.mp4"
       controls
       playsInline
       preload="metadata"

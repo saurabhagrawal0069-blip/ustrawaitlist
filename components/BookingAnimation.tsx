@@ -8,7 +8,7 @@ const scenes = [
     step: '01 / DISCOVER',
     title: 'Find the right salon, nearby.',
     copy: 'Explore trusted barbers and salons around your neighbourhood — all in one place.',
-    voice: 'USTRA पर अपने आसपास के अच्छे सैलून और बार्बर आसानी से खोजें। अब अलग-अलग जगह फोन करने या भटकने की ज़रूरत नहीं।',
+    voice: 'On USTRA, find good salons and barbers near you easily. No more calling different places or wandering around to look.',
     tag: 'SALONS NEAR YOU',
     icon: MapPin,
   },
@@ -16,7 +16,7 @@ const scenes = [
     step: '02 / CHOOSE A SLOT',
     title: 'Your time. Your appointment.',
     copy: 'Compare services, choose the professional you like, and pick a time that works for you.',
-    voice: 'अपनी पसंद का सैलून और सर्विस चुनें। फिर अपनी सुविधा के अनुसार अपॉइंटमेंट का समय बुक करें।',
+    voice: 'Choose the salon and service you like. Then book an appointment time that suits you.',
     tag: 'PICK YOUR TIME',
     icon: CalendarCheck,
   },
@@ -24,7 +24,7 @@ const scenes = [
     step: '03 / YOU’RE BOOKED',
     title: 'Skip the wait. Enjoy your day.',
     copy: 'Get your appointment details and spend less time searching or waiting around.',
-    voice: 'बस, आपकी बुकिंग हो गई। अब लंबा इंतज़ार और बेवजह की भागदौड़ कम। USTRA के साथ अपना समय बचाएँ और बेफिक्र रहें।',
+    voice: 'That is it, your booking is done. No more long waits or unnecessary running around. Save your time with USTRA and relax.',
     tag: 'BOOKING CONFIRMED',
     icon: Check,
   },
@@ -51,7 +51,7 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
     }
 
     const utterance = new SpeechSynthesisUtterance(scenes[active].voice);
-    utterance.lang = 'hi-IN';
+    utterance.lang = 'en-IN';
     utterance.rate = 0.92;
     utterance.pitch = 1;
     let nextTimer: number | undefined;
@@ -92,10 +92,10 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
               onClick={() => setVoiceOn((enabled) => !enabled)}
             >
               {voiceOn ? <VolumeX size={17} /> : <Volume2 size={17} />}
-              {voiceOn ? 'आवाज़ बंद करें' : 'हिंदी में सुनें'}
+              {voiceOn ? 'Mute narration' : 'Play narration'}
             </button>
           </div>
-          <p className="film-voice-hint">आवाज़ सुनने के लिए बटन दबाएँ।</p>
+          <p className="film-voice-hint">Press the button to hear the narration.</p>
         </div>
 
         <div className="booking-film-visual">

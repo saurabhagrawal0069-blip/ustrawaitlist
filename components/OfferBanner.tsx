@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Gift, type LucideIcon, Scissors, Store } from 'lucide-react';
-import { useLanguage } from '@/lib/i18n';
+import { Bi, pair } from '@/lib/i18n';
 import type { MessageKey } from '@/lib/messages';
 
 type Kind = 'customer' | 'business';
@@ -17,7 +17,6 @@ const INTERVAL_MS = 4000;
 const SWIPE_MIN_PX = 40;
 
 export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }) {
-  const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -49,7 +48,7 @@ export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }
     <section
       className="offer-banner"
       aria-roledescription="carousel"
-      aria-label={t('offer.aria')}
+      aria-label={pair('offer.aria')}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -67,17 +66,17 @@ export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }
               className={`offer-slide${active ? ' is-active' : ''}`}
               role="group"
               aria-roledescription="slide"
-              aria-label={t('offer.position', { n: i + 1, total: count })}
+              aria-label={pair('offer.position', { n: i + 1, total: count })}
               aria-hidden={!active}
             >
               <div className="offer-icon"><Icon size={26} /></div>
               <div className="offer-text">
-                <p className="eyebrow">{t(s.eyebrow)}</p>
-                <h3>{t(s.title)}</h3>
-                <p className="offer-sub">{t(s.sub)}</p>
+                <p className="eyebrow"><Bi k={s.eyebrow}/></p>
+                <h3><Bi k={s.title}/></h3>
+                <p className="offer-sub"><Bi k={s.sub}/></p>
               </div>
               <button type="button" className="button button-gold offer-cta" onClick={() => onJoin(s.kind)} tabIndex={active ? 0 : -1}>
-                {t(s.cta)} <ArrowRight size={16} />
+                <Bi k={s.cta} inline/> <ArrowRight size={16} />
               </button>
             </div>
           );
@@ -89,7 +88,7 @@ export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }
             key={s.id}
             type="button"
             className={`offer-dot${i === index ? ' is-active' : ''}`}
-            aria-label={t('offer.show', { n: i + 1 })}
+            aria-label={pair('offer.show', { n: i + 1 })}
             aria-current={i === index}
             onClick={() => setIndex(i)}
           />

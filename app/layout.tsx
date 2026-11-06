@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './bilingual.css';
 
 export const metadata: Metadata = {
   title: 'USTRA — Your Style. Our Priority.',

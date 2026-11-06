@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { CalendarCheck, Check, Clock3, MapPin, Scissors, Store, Volume2, VolumeX, type LucideIcon } from 'lucide-react';
-import { useLanguage } from '@/lib/i18n';
-import type { MessageKey } from '@/lib/messages';
+import { Bi, pair } from '@/lib/i18n';
+import { messages, type MessageKey } from '@/lib/messages';
 
 type Scene = {
   icon: LucideIcon;
@@ -27,7 +27,6 @@ const SCENES: Scene[] = [
 ];
 
 export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
-  const { t, lang } = useLanguage();
   const [active, setActive] = useState(0);
   const [voiceOn, setVoiceOn] = useState(false);
 
@@ -47,9 +46,9 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
       return;
     }
 
-    // The narration follows the page language: Hindi voice for Hindi, English voice for English.
-    const utterance = new SpeechSynthesisUtterance(t(SCENES[active].voice));
-    utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+    // The narration is in Hindi, as on the original explainer. The English text is on screen.
+    const utterance = new SpeechSynthesisUtterance(messages.hi[SCENES[active].voice]);
+    utterance.lang = 'hi-IN';
     utterance.rate = 0.92;
     utterance.pitch = 1;
     let nextTimer: number | undefined;
@@ -64,25 +63,25 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
       if (nextTimer !== undefined) window.clearTimeout(nextTimer);
       window.speechSynthesis.cancel();
     };
-  }, [active, voiceOn, lang, t]);
+  }, [active, voiceOn]);
 
   const scene = SCENES[active];
   const SceneIcon = scene.icon;
 
   return (
-    <section className="booking-film" aria-label={t('film.aria')}>
+    <section className="booking-film" aria-label={pair('film.aria')}>
       <div className="wrap booking-film-inner">
         <div className="booking-film-copy">
-          <p className="eyebrow"><span className="live-dot" /> {t('film.eyebrow')}</p>
-          <h2>{t('film.title1')}<br /><em>{t('film.title2')}</em></h2>
-          <p className="muted">{t('film.body')}</p>
+          <p className="eyebrow"><span className="live-dot" /> <Bi k="film.eyebrow"/></p>
+          <h2><Bi k="film.title1"/><br /><em><Bi k="film.title2"/></em></h2>
+          <p className="muted"><Bi k="film.body"/></p>
           <div className="film-scene-copy" aria-live="polite">
-            <span>{t(scene.step)}</span>
-            <h3>{t(scene.title)}</h3>
-            <p>{t(scene.copy)}</p>
+            <span><Bi k={scene.step}/></span>
+            <h3><Bi k={scene.title}/></h3>
+            <p><Bi k={scene.copy}/></p>
           </div>
           <div className="film-actions">
-            <button className="button button-gold" onClick={onJoin}>{t('film.join')} <span aria-hidden="true">→</span></button>
+            <button className="button button-gold" onClick={onJoin}><Bi k="film.join" inline/> <span aria-hidden="true">→</span></button>
             <button
               className="film-voice-button"
               type="button"
@@ -90,37 +89,37 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
               onClick={() => setVoiceOn((enabled) => !enabled)}
             >
               {voiceOn ? <VolumeX size={17} /> : <Volume2 size={17} />}
-              {voiceOn ? t('film.voice.mute') : t('film.voice.play')}
+              <Bi k={voiceOn ? 'film.voice.mute' : 'film.voice.play'} inline/>
             </button>
           </div>
-          <p className="film-voice-hint">{t('film.voice.hint')}</p>
+          <p className="film-voice-hint"><Bi k="film.voice.hint"/></p>
         </div>
 
         <div className="booking-film-visual">
           <div className="film-glow" />
           <div className="film-phone">
-            <div className="film-phone-top"><span>USTRA</span><span className="film-status"><i /> {t('film.phone.live')}</span></div>
+            <div className="film-phone-top"><span>USTRA</span><span className="film-status"><i /> <Bi k="film.phone.live" inline/></span></div>
             <div className="film-map">
               <div className="map-road road-one" /><div className="map-road road-two" /><div className="map-road road-three" />
               <span className="map-pin pin-one"><MapPin size={17} /></span>
               <span className="map-pin pin-two"><MapPin size={17} /></span>
               <span className="map-pin pin-three"><MapPin size={17} /></span>
-              <div className="map-you">{t('film.phone.here')}</div>
+              <div className="map-you"><Bi k="film.phone.here" inline/></div>
             </div>
             <div className="film-phone-content">
-              <div className="film-phone-heading"><div><small>{t(scene.tag)}</small><strong>{t(scene.heading)}</strong></div><span className="film-round-icon"><SceneIcon size={19} /></span></div>
+              <div className="film-phone-heading"><div><small><Bi k={scene.tag} inline/></small><strong><Bi k={scene.heading} inline/></strong></div><span className="film-round-icon"><SceneIcon size={19} /></span></div>
               <div className="film-listing">
-                <div className="film-shop-icon"><Scissors size={19}/></div><div><strong>{t(scene.shop1)}</strong><small>{t(scene.shop1sub)}</small></div><span className="film-listing-mark">{active === 2 ? <Check size={16}/> : '★ 4.8'}</span>
+                <div className="film-shop-icon"><Scissors size={19}/></div><div><strong><Bi k={scene.shop1} inline/></strong><small><Bi k={scene.shop1sub} inline/></small></div><span className="film-listing-mark">{active === 2 ? <Check size={16}/> : '★ 4.8'}</span>
               </div>
               <div className="film-listing second">
-                <div className="film-shop-icon"><Store size={19}/></div><div><strong>{t(scene.shop2)}</strong><small>{t(scene.shop2sub)}</small></div><span className="film-listing-mark">{active === 2 ? <Clock3 size={16}/> : '★ 4.6'}</span>
+                <div className="film-shop-icon"><Store size={19}/></div><div><strong><Bi k={scene.shop2} inline/></strong><small><Bi k={scene.shop2sub} inline/></small></div><span className="film-listing-mark">{active === 2 ? <Clock3 size={16}/> : '★ 4.6'}</span>
               </div>
-              <div className="film-confirm"><CalendarCheck size={16}/>{t(scene.confirm)}</div>
+              <div className="film-confirm"><CalendarCheck size={16}/><Bi k={scene.confirm} inline/></div>
             </div>
           </div>
-          <div className="film-floating-note"><Clock3 size={16}/><span><strong>{t('film.note.title')}</strong><small>{t('film.note.sub')}</small></span></div>
-          <div className="film-progress" aria-label={t('film.scene.label', { n: active + 1 })}>
-            {SCENES.map((item, index) => <button key={item.step} className={index === active ? 'active' : ''} onClick={() => setActive(index)} aria-label={t('film.scene.show', { n: index + 1 })} />)}
+          <div className="film-floating-note"><Clock3 size={16}/><span><strong><Bi k="film.note.title" inline/></strong><small><Bi k="film.note.sub" inline/></small></span></div>
+          <div className="film-progress" aria-label={pair('film.scene.label', { n: active + 1 })}>
+            {SCENES.map((item, index) => <button key={item.step} className={index === active ? 'active' : ''} onClick={() => setActive(index)} aria-label={pair('film.scene.show', { n: index + 1 })} />)}
           </div>
         </div>
       </div>

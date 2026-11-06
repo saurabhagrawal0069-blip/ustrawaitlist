@@ -1,66 +1,33 @@
-'use client';
+import { messages, type MessageKey } from '@/lib/messages';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { messages, type Lang, type MessageKey } from '@/lib/messages';
+type Params = Record<string, string | number>;
 
-const STORAGE_KEY = 'ustra-lang';
-
-type Translate = (key: MessageKey, params?: Record<string, string | number>) => string;
-
-type LanguageState = { lang: Lang; setLang: (lang: Lang) => void; t: Translate };
-
-const LanguageContext = createContext<LanguageState | null>(null);
-
-function readStoredLang(): Lang | null {
-  try {
-    const value = window.localStorage.getItem(STORAGE_KEY);
-    return value === 'en' || value === 'hi' ? value : null;
-  } catch {
-    // Storage can be blocked (private browsing). The page then just starts in English.
-    return null;
-  }
+function fill(text: string, params?: Params): string {
+  if (!params) return text;
+  let out = text;
+  for (const [name, value] of Object.entries(params)) out = out.replace(`{${name}}`, String(value));
+  return out;
 }
 
-/** Holds the page language. Starts in English, then switches to the visitor's last choice after load. */
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('en');
-
-  useEffect(() => {
-    const stored = readStoredLang();
-    if (stored) setLangState(stored);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
-
-  const setLang = useCallback((next: Lang) => {
-    setLangState(next);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      // The choice still applies for this page visit.
-    }
-  }, []);
-
-  const value = useMemo<LanguageState>(() => {
-    const t: Translate = (key, params) => {
-      let text = messages[lang][key] ?? messages.en[key];
-      if (params) {
-        for (const [name, replacement] of Object.entries(params)) {
-          text = text.replace(`{${name}}`, String(replacement));
-        }
-      }
-      return text;
-    };
-    return { lang, setLang, t };
-  }, [lang, setLang]);
-
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+/**
+ * The English text, with the same text in Hindi on the line underneath, so both show on the page at once.
+ * Use `inline` inside buttons and chips, where the Hindi goes on the same line after a dot.
+ */
+export function Bi({ k, params, inline = false }: { k: MessageKey; params?: Params; inline?: boolean }) {
+  const en = fill(messages.en[k], params);
+  const hi = fill(messages.hi[k], params);
+  // Some names are the same in both languages (shop names, for example). Show them once.
+  if (en === hi) return <>{en}</>;
+  return inline ? (
+    <>{en} <span className="hi-inline" lang="hi">· {hi}</span></>
+  ) : (
+    <>{en}<span className="hi-line" lang="hi">{hi}</span></>
+  );
 }
 
-export function useLanguage(): LanguageState {
-  const value = useContext(LanguageContext);
-  if (!value) throw new Error('useLanguage must be used inside LanguageProvider');
-  return value;
+/** Both languages as one plain string, for placeholders, option labels and aria labels. */
+export function pair(k: MessageKey, params?: Params): string {
+  const en = fill(messages.en[k], params);
+  const hi = fill(messages.hi[k], params);
+  return en === hi ? en : `${en} / ${hi}`;
 }

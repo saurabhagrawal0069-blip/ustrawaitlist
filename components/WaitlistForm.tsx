@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowRight, CheckCircle2, LoaderCircle } from 'lucide-react';
+import { trackStep } from '@/lib/tracking';
 
 type Kind = 'customer' | 'business';
 
@@ -21,6 +22,7 @@ export default function WaitlistForm({ kind, onClose }: { kind: Kind; onClose: (
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Registration could not be completed.');
       setDone({ id: data.id, position: data.position });
+      trackStep('submit', kind);
     } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.'); }
     finally { setBusy(false); }
   }

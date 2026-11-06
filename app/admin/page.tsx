@@ -7,6 +7,8 @@ import AdminDashboard, { type BusinessRow, type CustomerRow } from './AdminDashb
 import { ADMIN_COOKIE, adminSessionValue, safeEqual } from '@/lib/adminAuth';
 import { summarizeVideoViews, type VideoViewRow } from '@/lib/videoStats';
 import VideoInsights from './VideoInsights';
+import FunnelInsights from './FunnelInsights';
+import { summarizeFunnel, type FunnelRow } from '@/lib/funnel';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -71,7 +73,7 @@ export default async function AdminPage() {
   }
 
   const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
-  const [customersRes, businessesRes, videoRes] = await Promise.all([
+  const [customersRes, businessesRes, videoRes, funnelRes] = await Promise.all([
     supabase
       .from('customers')
       .select('waitlist_number, full_name, phone, email, city, locality, services, email_consent, whatsapp_consent, created_at')
@@ -85,6 +87,7 @@ export default async function AdminPage() {
       .select('visit_id, first_seen, last_seen, plays, watched_seconds, max_position, video_duration, country, device')
       .order('first_seen', { ascending: false })
       .limit(1000),
+    supabase.rpc('funnel_counts'),
   ]);
 
   const customers: CustomerRow[] = ((customersRes.data ?? []) as Row[]).map((c) => ({
@@ -117,16 +120,29 @@ export default async function AdminPage() {
 
   const loadError = customersRes.error?.message ?? businessesRes.error?.message ?? null;
 
+  const funnelPanel = funnelRes.error ? (
+    <p className="adm-error">Could not load funnel data: {funnelRes.error.message}</p>
+  ) : (
+    <FunnelInsights summary={summarizeFunnel((funnelRes.data ?? []) as FunnelRow[])} />
+  );
+
   const videoPanel = videoRes.error ? (
     <p className="adm-error">Could not load video data: {videoRes.error.message}</p>
   ) : (
     <VideoInsights stats={summarizeVideoViews((videoRes.data ?? []) as VideoViewRow[])} />
   );
 
+  const insights = (
+    <div className="adm-insights">
+      {funnelPanel}
+      {videoPanel}
+    </div>
+  );
+
   return (
     <main className="adm-page">
       <div className="adm-wrap">
-        <AdminDashboard customers={customers} businesses={businesses} loadError={loadError} videoPanel={videoPanel} />
+        <AdminDashboard customers={customers} businesses={businesses} loadError={loadError} insights={insights} />
       </div>
     </main>
   );

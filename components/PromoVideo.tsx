@@ -1,18 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { getVisitId, trackStep } from '@/lib/tracking';
 
 const HEARTBEAT_MS = 5000;
 const ENDPOINT = '/api/video-view';
-
-// A random id for this page visit only. Reloading the page starts a new one.
-function newVisitId(): string {
-  try {
-    return crypto.randomUUID();
-  } catch {
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-  }
-}
 
 /** The promo video. It sends anonymous viewing numbers: plays, seconds watched and how far it got. */
 export default function PromoVideo() {
@@ -22,7 +14,7 @@ export default function PromoVideo() {
     const video = ref.current;
     if (!video) return;
 
-    const visitId = newVisitId();
+    const visitId = getVisitId();
     const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
     let plays = 0;
     let watched = 0;
@@ -57,6 +49,7 @@ export default function PromoVideo() {
 
     const onPlay = () => {
       plays += 1;
+      if (plays === 1) trackStep('play');
       lastTime = video.currentTime;
     };
     const onTimeUpdate = () => {

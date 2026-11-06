@@ -52,12 +52,12 @@ export default function AdminDashboard({
   customers,
   businesses,
   loadError,
-  videoPanel,
+  insights,
 }: {
   customers: CustomerRow[];
   businesses: BusinessRow[];
   loadError: string | null;
-  videoPanel?: ReactNode;
+  insights?: ReactNode;
 }) {
   const [tab, setTab] = useState<Tab>('customers');
   const [query, setQuery] = useState('');
@@ -114,7 +114,7 @@ export default function AdminDashboard({
         </div>
       </div>
 
-      {videoPanel}
+      {insights}
 
       <div className="adm-toolbar">
         <div className="adm-seg" role="tablist" aria-label="Registration type">

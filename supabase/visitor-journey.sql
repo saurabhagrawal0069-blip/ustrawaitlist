@@ -2,9 +2,9 @@
 -- The browser keeps a random id in localStorage (key "ustra-vid"). It is stored on the registration and on
 -- each tracking row. No name, phone number or IP address is added to the tracking tables.
 --
--- NOT applied yet. Apply it together with the code that sends visitor_id. This file replaces the 3-argument
--- record_funnel_event and the 7-argument record_video_view, which the live site still calls until that code
--- is deployed. Applying it earlier would silently stop funnel and video tracking on the live site.
+-- Applied to the ustrawaitlist project as migration "visitor_journey".
+-- The older 3-argument record_funnel_event and 7-argument record_video_view are kept for now, so the live site
+-- keeps working until the code that sends visitor_id is deployed. The cleanup at the end removes them.
 
 alter table public.customers add column if not exists visitor_id text;
 alter table public.businesses add column if not exists visitor_id text;
@@ -17,8 +17,6 @@ create index if not exists funnel_events_visitor_id_idx on public.funnel_events 
 create index if not exists video_views_visitor_id_idx on public.video_views (visitor_id);
 
 -- Funnel step: same rules as before, plus the browser's visitor id.
-drop function if exists public.record_funnel_event(text, text, text);
-
 create or replace function public.record_funnel_event(_visit_id text, _stage text, _kind text, _visitor_id text)
 returns void
 language sql
@@ -31,8 +29,6 @@ as $$
 $$;
 
 -- Video view: same rules as before (values only go up), plus the visitor id. The first id seen is kept.
-drop function if exists public.record_video_view(text, integer, numeric, numeric, numeric, text, text);
-
 create or replace function public.record_video_view(
   _visit_id text,
   _plays integer,
@@ -111,3 +107,7 @@ $$;
 revoke execute on function public.record_funnel_event(text, text, text, text) from public, anon, authenticated;
 revoke execute on function public.record_video_view(text, integer, numeric, numeric, numeric, text, text, text) from public, anon, authenticated;
 revoke execute on function public.visitor_journeys() from public, anon, authenticated;
+
+-- Cleanup, run only after the new code is live on the site:
+-- drop function if exists public.record_funnel_event(text, text, text);
+-- drop function if exists public.record_video_view(text, integer, numeric, numeric, numeric, text, text);

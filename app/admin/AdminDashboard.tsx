@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import LogoutButton from './LogoutButton';
 
 export type CustomerRow = {
@@ -52,10 +52,12 @@ export default function AdminDashboard({
   customers,
   businesses,
   loadError,
+  videoPanel,
 }: {
   customers: CustomerRow[];
   businesses: BusinessRow[];
   loadError: string | null;
+  videoPanel?: ReactNode;
 }) {
   const [tab, setTab] = useState<Tab>('customers');
   const [query, setQuery] = useState('');
@@ -111,6 +113,8 @@ export default function AdminDashboard({
           <strong>{customers.length + businesses.length}</strong>
         </div>
       </div>
+
+      {videoPanel}
 
       <div className="adm-toolbar">
         <div className="adm-seg" role="tablist" aria-label="Registration type">

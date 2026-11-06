@@ -9,6 +9,8 @@ import { summarizeVideoViews, type VideoViewRow } from '@/lib/videoStats';
 import VideoInsights from './VideoInsights';
 import FunnelInsights from './FunnelInsights';
 import { summarizeFunnel, type FunnelRow } from '@/lib/funnel';
+import { getSignupCount, type SignupCount } from '@/lib/signupCount';
+import PublicCount from './PublicCount';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -120,6 +122,20 @@ export default async function AdminPage() {
 
   const loadError = customersRes.error?.message ?? businessesRes.error?.message ?? null;
 
+  const asOf = new Date().toISOString();
+  let signupCount: SignupCount | null = null;
+  let signupCountError = '';
+  try {
+    signupCount = await getSignupCount(supabase);
+  } catch (err) {
+    signupCountError = err instanceof Error ? err.message : 'unknown error';
+  }
+  const counterPanel = signupCount ? (
+    <PublicCount count={signupCount} asOf={asOf} />
+  ) : (
+    <p className="adm-error">Could not load the landing page counter: {signupCountError}</p>
+  );
+
   const funnelPanel = funnelRes.error ? (
     <p className="adm-error">Could not load funnel data: {funnelRes.error.message}</p>
   ) : (
@@ -134,6 +150,7 @@ export default async function AdminPage() {
 
   const insights = (
     <div className="adm-insights">
+      {counterPanel}
       {funnelPanel}
       {videoPanel}
     </div>

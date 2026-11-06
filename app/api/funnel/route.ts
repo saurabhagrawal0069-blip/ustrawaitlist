@@ -16,6 +16,7 @@ export async function POST(request: Request) {
   const visitId = typeof body?.visitId === 'string' ? body.visitId : '';
   const stage = typeof body?.stage === 'string' ? body.stage : '';
   const kind = typeof body?.kind === 'string' ? body.kind : '';
+  const visitorId = typeof body?.visitorId === 'string' && VISIT_ID.test(body.visitorId) ? body.visitorId : null;
   if (!VISIT_ID.test(visitId) || !STAGES.includes(stage) || !KINDS.includes(kind)) {
     return NextResponse.json({ ok: false }, { status: 400 });
   }
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
     _visit_id: visitId,
     _stage: stage,
     _kind: kind,
+    _visitor_id: visitorId,
   });
   if (error) return NextResponse.json({ ok: false }, { status: 500 });
   return NextResponse.json({ ok: true });

@@ -7,6 +7,8 @@ export const runtime = 'nodejs';
 const CUSTOMER_SERVICES = ['Haircut', 'Beard styling', 'Shaving', 'Facial', 'Hair spa', 'Massage'];
 const BUSINESS_TYPES = ['Barber Shop', 'Premium Salon', 'Unisex Salon', 'Grooming Studio', 'Independent Barber'];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Random id from the visitor's browser (see lib/tracking.ts). Stored only if it has the expected shape.
+const VISITOR_ID = /^[A-Za-z0-9-]{8,64}$/;
 // Anti-spam: one network (hashed IP address) may register this many times per hour, across both forms.
 const MAX_REGISTRATIONS_PER_HOUR = 10;
 
@@ -56,6 +58,7 @@ export async function POST(request: Request) {
     const emailConsent = body.emailConsent === true;
     const whatsappConsent = body.whatsappConsent === true;
     const emailLanguage = normalizeLanguage(body.emailLanguage);
+    const visitorId = typeof body.visitorId === 'string' && VISITOR_ID.test(body.visitorId) ? body.visitorId : null;
 
     if (!name || !city) return bad('Please complete all required fields.');
     const phoneDigits = normalizePhone(clean(body.phone, 30));
@@ -90,8 +93,8 @@ export async function POST(request: Request) {
     const phone = `+${phoneDigits}`;
     // One insert per table, so TypeScript checks each row against its own columns.
     const { data, error } = kind === 'customer'
-      ? await supabase.from('customers').insert({ full_name: name, phone, email: email || null, city, locality: locality || null, services, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash }).select('id, waitlist_number').single()
-      : await supabase.from('businesses').insert({ owner_name: name, phone, email: email || null, city, locality: locality || null, business_name: businessName, business_type: businessType, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash }).select('id, waitlist_number').single();
+      ? await supabase.from('customers').insert({ full_name: name, phone, email: email || null, city, locality: locality || null, services, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash, visitor_id: visitorId }).select('id, waitlist_number').single()
+      : await supabase.from('businesses').insert({ owner_name: name, phone, email: email || null, city, locality: locality || null, business_name: businessName, business_type: businessType, email_consent: emailConsent, whatsapp_consent: whatsappConsent, signup_ip_hash: ipHash, visitor_id: visitorId }).select('id, waitlist_number').single();
     if (error) {
       if (error.code === '23505') return bad('This mobile number is already registered for this waitlist.', 409);
       console.error('Supabase registration error:', error);

@@ -8,7 +8,7 @@ export default function FunnelInsights({ summary }: { summary: FunnelSummary }) 
       <div className="adm-video-head">
         <h2 id="funnel-title">Visitor funnel</h2>
         <p className="adm-muted">
-          Anonymous. Each visitor counts once per step, even if they repeat it. Share is of everyone who landed on the page.
+          Each visitor counts once per step, even if they repeat it. Share is of everyone who landed on the page. Registered visitors are listed separately below.
         </p>
       </div>
 

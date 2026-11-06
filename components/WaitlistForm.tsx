@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ArrowRight, CheckCircle2, LoaderCircle } from 'lucide-react';
-import { trackStep } from '@/lib/tracking';
+import { getVisitorId, trackStep } from '@/lib/tracking';
 
 type Kind = 'customer' | 'business';
 
@@ -18,7 +18,7 @@ export default function WaitlistForm({ kind, onClose }: { kind: Kind; onClose: (
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setBusy(true); setError('');
     try {
-      const response = await fetch('/api/waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, kind }) });
+      const response = await fetch('/api/waitlist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, kind, visitorId: getVisitorId() }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Registration could not be completed.');
       setDone({ id: data.id, position: data.position });
@@ -37,6 +37,7 @@ export default function WaitlistForm({ kind, onClose }: { kind: Kind; onClose: (
     {!isBusiness && <div className="service-picker"><p className="label-title">What grooming services interest you?</p><div className="chips">{['Haircut','Beard styling','Shaving','Facial','Hair spa','Massage'].map(s=><button type="button" key={s} className={`chip ${form.services.includes(s)?'selected':''}`} onClick={()=>toggleService(s)}>{s}</button>)}</div></div>}
     <div className="field-grid"><label className="span-two">Email language<select value={form.emailLanguage} onChange={e=>update('emailLanguage',e.target.value)}><option value="en">English</option><option value="hi">हिंदी (Hindi)</option></select></label></div>
     <div className="consents"><label><input type="checkbox" checked={form.emailConsent} onChange={e=>update('emailConsent',e.target.checked)}/> I agree to receive my registration confirmation and important updates by email.</label><label><input type="checkbox" checked={form.whatsappConsent} onChange={e=>update('whatsappConsent',e.target.checked)}/> I agree to receive my registration confirmation and important updates on WhatsApp.</label></div>
+    <p className="muted small">We also link the pages you view and the videos you watch in this browser with the details you submit here, to understand how people find USTRA.</p>
     {error && <p className="error">{error}</p>}
     <button className="button button-gold full" disabled={busy}>{busy ? <><LoaderCircle className="spin" size={18}/> Joining...</> : <>JOIN THE WAITLIST <ArrowRight size={18}/></>}</button>
     <p className="form-foot">No payment required. Your details stay protected.</p>

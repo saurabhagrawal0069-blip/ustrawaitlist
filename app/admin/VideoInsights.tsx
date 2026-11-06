@@ -74,7 +74,7 @@ export default function VideoInsights({ stats, title = 'Promo video' }: { stats:
       <div className="adm-video-head">
         <h2 id={id}>{title}</h2>
         <p className="adm-muted">
-          Anonymous viewing data from the landing page. No names, phone numbers or IP addresses are stored.
+          Viewing data from the landing page. A view is linked to a registration only if the same browser later signs up. No IP addresses are stored.
         </p>
       </div>
 

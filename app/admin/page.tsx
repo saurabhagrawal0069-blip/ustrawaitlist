@@ -8,7 +8,9 @@ import { ADMIN_COOKIE, adminSessionValue, safeEqual } from '@/lib/adminAuth';
 import { splitVideoRows, summarizeVideoViews, type VideoViewRow } from '@/lib/videoStats';
 import VideoInsights from './VideoInsights';
 import FunnelInsights from './FunnelInsights';
+import VisitorJourney from './VisitorJourney';
 import { summarizeFunnel, type FunnelRow } from '@/lib/funnel';
+import { indexJourneys, summarizeVisitorJourneys, type JourneyRow, type Registrant } from '@/lib/visitorJourney';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -73,14 +75,14 @@ export default async function AdminPage() {
   }
 
   const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
-  const [customersRes, businessesRes, videoRes, funnelRes] = await Promise.all([
+  const [customersRes, businessesRes, videoRes, funnelRes, journeyRes] = await Promise.all([
     supabase
       .from('customers')
-      .select('waitlist_number, full_name, phone, email, city, locality, services, email_consent, whatsapp_consent, created_at')
+      .select('waitlist_number, full_name, phone, email, city, locality, services, email_consent, whatsapp_consent, created_at, visitor_id')
       .order('waitlist_number', { ascending: true }),
     supabase
       .from('businesses')
-      .select('waitlist_number, owner_name, business_name, business_type, phone, email, city, locality, verification_status, email_consent, whatsapp_consent, created_at')
+      .select('waitlist_number, owner_name, business_name, business_type, phone, email, city, locality, verification_status, email_consent, whatsapp_consent, created_at, visitor_id')
       .order('waitlist_number', { ascending: true }),
     supabase
       .from('video_views')
@@ -88,6 +90,7 @@ export default async function AdminPage() {
       .order('first_seen', { ascending: false })
       .limit(1000),
     supabase.rpc('funnel_counts'),
+    supabase.rpc('visitor_journeys'),
   ]);
 
   const customers: CustomerRow[] = ((customersRes.data ?? []) as Row[]).map((c) => ({
@@ -126,6 +129,35 @@ export default async function AdminPage() {
     <FunnelInsights summary={summarizeFunnel((funnelRes.data ?? []) as FunnelRow[])} />
   );
 
+  const registrants: Registrant[] = [
+    ...((customersRes.data ?? []) as Row[]).map((c): Registrant => ({
+      id: `UST-C-${String(c.waitlist_number).padStart(6, '0')}`,
+      kind: 'customer',
+      visitorId: typeof c.visitor_id === 'string' ? c.visitor_id : null,
+      name: text(c.full_name),
+      business: '—',
+      phone: text(c.phone),
+      city: text(c.city),
+      signedUp: String(c.created_at),
+    })),
+    ...((businessesRes.data ?? []) as Row[]).map((b): Registrant => ({
+      id: `UST-B-${String(b.waitlist_number).padStart(6, '0')}`,
+      kind: 'business',
+      visitorId: typeof b.visitor_id === 'string' ? b.visitor_id : null,
+      name: text(b.owner_name),
+      business: text(b.business_name),
+      phone: text(b.phone),
+      city: text(b.city),
+      signedUp: String(b.created_at),
+    })),
+  ];
+
+  const visitorPanel = journeyRes.error ? (
+    <p className="adm-error">Could not load visitor data: {journeyRes.error.message}</p>
+  ) : (
+    <VisitorJourney summary={summarizeVisitorJourneys(registrants, indexJourneys((journeyRes.data ?? []) as JourneyRow[]))} />
+  );
+
   const { narrated, short } = splitVideoRows((videoRes.data ?? []) as VideoViewRow[]);
   const videoPanel = videoRes.error ? (
     <p className="adm-error">Could not load video data: {videoRes.error.message}</p>
@@ -139,6 +171,7 @@ export default async function AdminPage() {
   const insights = (
     <div className="adm-insights">
       {funnelPanel}
+      {visitorPanel}
       {videoPanel}
     </div>
   );

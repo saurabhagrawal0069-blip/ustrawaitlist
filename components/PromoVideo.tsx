@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { getVisitId, trackStep } from '@/lib/tracking';
+import { getVisitId, getVisitorId, trackStep } from '@/lib/tracking';
 
 const HEARTBEAT_MS = 5000;
 const ENDPOINT = '/api/video-view';
 
-/** The promo video. It sends anonymous viewing numbers: plays, seconds watched and how far it got. */
+/** The promo video. It sends viewing numbers: plays, seconds watched and how far it got. */
 export default function PromoVideo({ src, videoKey }: { src: string; videoKey: string }) {
   const ref = useRef<HTMLVideoElement>(null);
 
@@ -16,6 +16,7 @@ export default function PromoVideo({ src, videoKey }: { src: string; videoKey: s
 
     // Each video gets its own visit row, so the admin can tell their numbers apart.
     const visitId = `${getVisitId()}-${videoKey}`;
+    const visitorId = getVisitorId();
     const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
     let plays = 0;
     let watched = 0;
@@ -28,6 +29,7 @@ export default function PromoVideo({ src, videoKey }: { src: string; videoKey: s
       if (plays === 0) return; // Only visits where the video was actually played are recorded.
       const body = JSON.stringify({
         visitId,
+        visitorId,
         device,
         plays,
         watched: Math.round(watched * 10) / 10,

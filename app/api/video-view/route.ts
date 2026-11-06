@@ -21,6 +21,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const visitId = typeof body?.visitId === 'string' ? body.visitId : '';
   if (!VISIT_ID.test(visitId)) return NextResponse.json({ ok: false }, { status: 400 });
+  const visitorId = typeof body?.visitorId === 'string' && VISIT_ID.test(body.visitorId) ? body.visitorId : null;
 
   // Cloudflare sets this header to the visitor's country. Only the country is kept, never the IP address.
   const countryHeader = (request.headers.get('cf-ipcountry') || '').toUpperCase();
@@ -36,6 +37,7 @@ export async function POST(request: Request) {
     _duration: duration > 0 ? duration : null,
     _country: country,
     _device: body?.device === 'mobile' ? 'mobile' : 'desktop',
+    _visitor_id: visitorId,
   });
   if (error) return NextResponse.json({ ok: false }, { status: 500 });
   return NextResponse.json({ ok: true });

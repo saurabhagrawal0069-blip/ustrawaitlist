@@ -1,42 +1,39 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CalendarCheck, Check, Clock3, MapPin, Scissors, Store, Volume2, VolumeX } from 'lucide-react';
+import { CalendarCheck, Check, Clock3, MapPin, Scissors, Store, Volume2, VolumeX, type LucideIcon } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
+import type { MessageKey } from '@/lib/messages';
 
-const scenes = [
-  {
-    step: '01 / DISCOVER',
-    title: 'Find the right salon, nearby.',
-    copy: 'Explore trusted barbers and salons around your neighbourhood — all in one place.',
-    voice: 'On USTRA, find good salons and barbers near you easily. No more calling different places or wandering around to look.',
-    tag: 'SALONS NEAR YOU',
-    icon: MapPin,
-  },
-  {
-    step: '02 / CHOOSE A SLOT',
-    title: 'Your time. Your appointment.',
-    copy: 'Compare services, choose the professional you like, and pick a time that works for you.',
-    voice: 'Choose the salon and service you like. Then book an appointment time that suits you.',
-    tag: 'PICK YOUR TIME',
-    icon: CalendarCheck,
-  },
-  {
-    step: '03 / YOU’RE BOOKED',
-    title: 'Skip the wait. Enjoy your day.',
-    copy: 'Get your appointment details and spend less time searching or waiting around.',
-    voice: 'That is it, your booking is done. No more long waits or unnecessary running around. Save your time with USTRA and relax.',
-    tag: 'BOOKING CONFIRMED',
-    icon: Check,
-  },
+type Scene = {
+  icon: LucideIcon;
+  step: MessageKey;
+  title: MessageKey;
+  copy: MessageKey;
+  voice: MessageKey;
+  tag: MessageKey;
+  heading: MessageKey;
+  shop1: MessageKey;
+  shop1sub: MessageKey;
+  shop2: MessageKey;
+  shop2sub: MessageKey;
+  confirm: MessageKey;
+};
+
+const SCENES: Scene[] = [
+  { icon: MapPin, step: 's1.step', title: 's1.title', copy: 's1.copy', voice: 's1.voice', tag: 's1.tag', heading: 's1.heading', shop1: 's1.shop1', shop1sub: 's1.shop1sub', shop2: 's1.shop2', shop2sub: 's1.shop2sub', confirm: 's1.confirm' },
+  { icon: CalendarCheck, step: 's2.step', title: 's2.title', copy: 's2.copy', voice: 's2.voice', tag: 's2.tag', heading: 's2.heading', shop1: 's2.shop1', shop1sub: 's2.shop1sub', shop2: 's2.shop2', shop2sub: 's2.shop2sub', confirm: 's2.confirm' },
+  { icon: Check, step: 's3.step', title: 's3.title', copy: 's3.copy', voice: 's3.voice', tag: 's3.tag', heading: 's3.heading', shop1: 's3.shop1', shop1sub: 's3.shop1sub', shop2: 's3.shop2', shop2sub: 's3.shop2sub', confirm: 's3.confirm' },
 ];
 
 export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
+  const { t, lang } = useLanguage();
   const [active, setActive] = useState(0);
   const [voiceOn, setVoiceOn] = useState(false);
 
   useEffect(() => {
     if (voiceOn) return;
-    const timer = window.setInterval(() => setActive((current) => (current + 1) % scenes.length), 3800);
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % SCENES.length), 3800);
     return () => window.clearInterval(timer);
   }, [voiceOn]);
 
@@ -50,13 +47,14 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(scenes[active].voice);
-    utterance.lang = 'en-IN';
+    // The narration follows the page language: Hindi voice for Hindi, English voice for English.
+    const utterance = new SpeechSynthesisUtterance(t(SCENES[active].voice));
+    utterance.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
     utterance.rate = 0.92;
     utterance.pitch = 1;
     let nextTimer: number | undefined;
     utterance.onend = () => {
-      nextTimer = window.setTimeout(() => setActive((current) => (current + 1) % scenes.length), 450);
+      nextTimer = window.setTimeout(() => setActive((current) => (current + 1) % SCENES.length), 450);
     };
     utterance.onerror = () => setVoiceOn(false);
     window.speechSynthesis.cancel();
@@ -66,25 +64,25 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
       if (nextTimer !== undefined) window.clearTimeout(nextTimer);
       window.speechSynthesis.cancel();
     };
-  }, [active, voiceOn]);
+  }, [active, voiceOn, lang, t]);
 
-  const scene = scenes[active];
+  const scene = SCENES[active];
   const SceneIcon = scene.icon;
 
   return (
-    <section className="booking-film" aria-label="How USTRA makes salon bookings easier">
+    <section className="booking-film" aria-label={t('film.aria')}>
       <div className="wrap booking-film-inner">
         <div className="booking-film-copy">
-          <p className="eyebrow"><span className="live-dot" /> LESS SEARCHING. MORE LIVING.</p>
-          <h2>YOUR NEXT VISIT.<br /><em>WITHOUT THE WAIT.</em></h2>
-          <p className="muted">USTRA brings customers and local grooming professionals together, so finding and booking your next appointment feels simple.</p>
+          <p className="eyebrow"><span className="live-dot" /> {t('film.eyebrow')}</p>
+          <h2>{t('film.title1')}<br /><em>{t('film.title2')}</em></h2>
+          <p className="muted">{t('film.body')}</p>
           <div className="film-scene-copy" aria-live="polite">
-            <span>{scene.step}</span>
-            <h3>{scene.title}</h3>
-            <p>{scene.copy}</p>
+            <span>{t(scene.step)}</span>
+            <h3>{t(scene.title)}</h3>
+            <p>{t(scene.copy)}</p>
           </div>
           <div className="film-actions">
-            <button className="button button-gold" onClick={onJoin}>JOIN THE WAITLIST <span aria-hidden="true">→</span></button>
+            <button className="button button-gold" onClick={onJoin}>{t('film.join')} <span aria-hidden="true">→</span></button>
             <button
               className="film-voice-button"
               type="button"
@@ -92,37 +90,37 @@ export default function BookingAnimation({ onJoin }: { onJoin: () => void }) {
               onClick={() => setVoiceOn((enabled) => !enabled)}
             >
               {voiceOn ? <VolumeX size={17} /> : <Volume2 size={17} />}
-              {voiceOn ? 'Mute narration' : 'Play narration'}
+              {voiceOn ? t('film.voice.mute') : t('film.voice.play')}
             </button>
           </div>
-          <p className="film-voice-hint">Press the button to hear the narration.</p>
+          <p className="film-voice-hint">{t('film.voice.hint')}</p>
         </div>
 
         <div className="booking-film-visual">
           <div className="film-glow" />
           <div className="film-phone">
-            <div className="film-phone-top"><span>USTRA</span><span className="film-status"><i /> LIVE PREVIEW</span></div>
+            <div className="film-phone-top"><span>USTRA</span><span className="film-status"><i /> {t('film.phone.live')}</span></div>
             <div className="film-map">
               <div className="map-road road-one" /><div className="map-road road-two" /><div className="map-road road-three" />
               <span className="map-pin pin-one"><MapPin size={17} /></span>
               <span className="map-pin pin-two"><MapPin size={17} /></span>
               <span className="map-pin pin-three"><MapPin size={17} /></span>
-              <div className="map-you">YOU ARE HERE</div>
+              <div className="map-you">{t('film.phone.here')}</div>
             </div>
             <div className="film-phone-content">
-              <div className="film-phone-heading"><div><small>{scene.tag}</small><strong>{active === 0 ? 'Find your barber' : active === 1 ? 'Choose your slot' : 'All set!'}</strong></div><span className="film-round-icon"><SceneIcon size={19} /></span></div>
+              <div className="film-phone-heading"><div><small>{t(scene.tag)}</small><strong>{t(scene.heading)}</strong></div><span className="film-round-icon"><SceneIcon size={19} /></span></div>
               <div className="film-listing">
-                <div className="film-shop-icon"><Scissors size={19}/></div><div><strong>{active === 0 ? 'The Groom Room' : active === 1 ? 'Classic Hair Studio' : 'Appointment saved'}</strong><small>{active === 0 ? 'Barber shop · 0.8 km away' : active === 1 ? 'Haircut · Today, 5:30 PM' : 'Today · 5:30 PM'}</small></div><span className="film-listing-mark">{active === 2 ? <Check size={16}/> : '★ 4.8'}</span>
+                <div className="film-shop-icon"><Scissors size={19}/></div><div><strong>{t(scene.shop1)}</strong><small>{t(scene.shop1sub)}</small></div><span className="film-listing-mark">{active === 2 ? <Check size={16}/> : '★ 4.8'}</span>
               </div>
               <div className="film-listing second">
-                <div className="film-shop-icon"><Store size={19}/></div><div><strong>{active === 0 ? 'Urban Style Salon' : active === 1 ? 'Your time is reserved' : 'More time for you'}</strong><small>{active === 0 ? 'Unisex salon · 1.2 km away' : active === 1 ? 'No more calling around' : 'Less searching, less waiting'}</small></div><span className="film-listing-mark">{active === 2 ? <Clock3 size={16}/> : '★ 4.6'}</span>
+                <div className="film-shop-icon"><Store size={19}/></div><div><strong>{t(scene.shop2)}</strong><small>{t(scene.shop2sub)}</small></div><span className="film-listing-mark">{active === 2 ? <Clock3 size={16}/> : '★ 4.6'}</span>
               </div>
-              <div className="film-confirm"><CalendarCheck size={16}/>{active === 2 ? 'BOOKING CONFIRMED' : active === 1 ? 'SELECT A CONVENIENT TIME' : 'DISCOVER · COMPARE · BOOK'}</div>
+              <div className="film-confirm"><CalendarCheck size={16}/>{t(scene.confirm)}</div>
             </div>
           </div>
-          <div className="film-floating-note"><Clock3 size={16}/><span><strong>YOUR TIME MATTERS</strong><small>Make every visit count</small></span></div>
-          <div className="film-progress" aria-label={`Scene ${active + 1} of 3`}>
-            {scenes.map((item, index) => <button key={item.step} className={index === active ? 'active' : ''} onClick={() => setActive(index)} aria-label={`Show scene ${index + 1}`} />)}
+          <div className="film-floating-note"><Clock3 size={16}/><span><strong>{t('film.note.title')}</strong><small>{t('film.note.sub')}</small></span></div>
+          <div className="film-progress" aria-label={t('film.scene.label', { n: active + 1 })}>
+            {SCENES.map((item, index) => <button key={item.step} className={index === active ? 'active' : ''} onClick={() => setActive(index)} aria-label={t('film.scene.show', { n: index + 1 })} />)}
           </div>
         </div>
       </div>

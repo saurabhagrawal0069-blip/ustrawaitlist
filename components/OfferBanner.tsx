@@ -2,19 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Gift, type LucideIcon, Scissors, Store } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
+import type { MessageKey } from '@/lib/messages';
 
 type Kind = 'customer' | 'business';
 
-const SLIDES: { eyebrow: string; title: string; sub: string; cta: string; kind: Kind; icon: LucideIcon }[] = [
-  { eyebrow: 'EARLY ACCESS OFFER', title: 'Join first, get launch privileges', sub: 'Waitlist members hear about USTRA opening in their city before anyone else.', cta: 'JOIN AS CUSTOMER', kind: 'customer', icon: Gift },
-  { eyebrow: 'FOR BARBERS & SALONS', title: 'Become a founding partner', sub: 'Get listed in the early partner network and reach local customers from day one.', cta: 'JOIN AS BUSINESS', kind: 'business', icon: Store },
-  { eyebrow: 'BOOK SMARTER', title: 'Trusted grooming near you', sub: 'Haircut, beard, shave, facial and more, all in one place.', cta: 'CLAIM YOUR SPOT', kind: 'customer', icon: Scissors },
+const SLIDES: { id: number; eyebrow: MessageKey; title: MessageKey; sub: MessageKey; cta: MessageKey; kind: Kind; icon: LucideIcon }[] = [
+  { id: 1, eyebrow: 'offer.1.eyebrow', title: 'offer.1.title', sub: 'offer.1.sub', cta: 'offer.1.cta', kind: 'customer', icon: Gift },
+  { id: 2, eyebrow: 'offer.2.eyebrow', title: 'offer.2.title', sub: 'offer.2.sub', cta: 'offer.2.cta', kind: 'business', icon: Store },
+  { id: 3, eyebrow: 'offer.3.eyebrow', title: 'offer.3.title', sub: 'offer.3.sub', cta: 'offer.3.cta', kind: 'customer', icon: Scissors },
 ];
 
 const INTERVAL_MS = 4000;
 const SWIPE_MIN_PX = 40;
 
 export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }) {
+  const { t } = useLanguage();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
@@ -46,7 +49,7 @@ export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }
     <section
       className="offer-banner"
       aria-roledescription="carousel"
-      aria-label="Waitlist offers"
+      aria-label={t('offer.aria')}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -60,21 +63,21 @@ export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }
           const active = i === index;
           return (
             <div
-              key={s.title}
+              key={s.id}
               className={`offer-slide${active ? ' is-active' : ''}`}
               role="group"
               aria-roledescription="slide"
-              aria-label={`${i + 1} of ${count}`}
+              aria-label={t('offer.position', { n: i + 1, total: count })}
               aria-hidden={!active}
             >
               <div className="offer-icon"><Icon size={26} /></div>
               <div className="offer-text">
-                <p className="eyebrow">{s.eyebrow}</p>
-                <h3>{s.title}</h3>
-                <p className="offer-sub">{s.sub}</p>
+                <p className="eyebrow">{t(s.eyebrow)}</p>
+                <h3>{t(s.title)}</h3>
+                <p className="offer-sub">{t(s.sub)}</p>
               </div>
               <button type="button" className="button button-gold offer-cta" onClick={() => onJoin(s.kind)} tabIndex={active ? 0 : -1}>
-                {s.cta} <ArrowRight size={16} />
+                {t(s.cta)} <ArrowRight size={16} />
               </button>
             </div>
           );
@@ -83,10 +86,10 @@ export default function OfferBanner({ onJoin }: { onJoin: (kind: Kind) => void }
       <div className="offer-dots">
         {SLIDES.map((s, i) => (
           <button
-            key={s.title}
+            key={s.id}
             type="button"
             className={`offer-dot${i === index ? ' is-active' : ''}`}
-            aria-label={`Show offer ${i + 1}`}
+            aria-label={t('offer.show', { n: i + 1 })}
             aria-current={i === index}
             onClick={() => setIndex(i)}
           />

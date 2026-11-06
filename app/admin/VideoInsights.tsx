@@ -67,11 +67,12 @@ function Breakdown({
 }
 
 /** Admin view of the promo video: how many people played it, how far they got, and where they are. */
-export default function VideoInsights({ stats }: { stats: VideoStats }) {
+export default function VideoInsights({ stats, title = 'Promo video' }: { stats: VideoStats; title?: string }) {
+  const id = `video-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   return (
-    <section className="adm-panel adm-video" aria-labelledby="video-insights-title">
+    <section className="adm-panel adm-video" aria-labelledby={id}>
       <div className="adm-video-head">
-        <h2 id="video-insights-title">Promo video</h2>
+        <h2 id={id}>{title}</h2>
         <p className="adm-muted">
           Anonymous viewing data from the landing page. No names, phone numbers or IP addresses are stored.
         </p>

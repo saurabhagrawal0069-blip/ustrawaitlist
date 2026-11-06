@@ -103,3 +103,14 @@ export function summarizeVideoViews(rows: VideoViewRow[]): VideoStats {
     })),
   };
 }
+
+/**
+ * Each video stores its own visits, with its key at the end of visit_id.
+ * Visits from before the short film have no key, so they belong to the narrated promo.
+ */
+export function splitVideoRows(rows: VideoViewRow[]) {
+  return {
+    narrated: rows.filter((r) => !r.visit_id.endsWith('-short')),
+    short: rows.filter((r) => r.visit_id.endsWith('-short')),
+  };
+}

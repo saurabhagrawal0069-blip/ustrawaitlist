@@ -7,14 +7,15 @@ const HEARTBEAT_MS = 5000;
 const ENDPOINT = '/api/video-view';
 
 /** The promo video. It sends anonymous viewing numbers: plays, seconds watched and how far it got. */
-export default function PromoVideo() {
+export default function PromoVideo({ src, videoKey }: { src: string; videoKey: string }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
 
-    const visitId = getVisitId();
+    // Each video gets its own visit row, so the admin can tell their numbers apart.
+    const visitId = `${getVisitId()}-${videoKey}`;
     const device = window.innerWidth < 768 ? 'mobile' : 'desktop';
     let plays = 0;
     let watched = 0;
@@ -98,12 +99,12 @@ export default function PromoVideo() {
       document.removeEventListener('visibilitychange', onHidden);
       window.removeEventListener('pagehide', onStop);
     };
-  }, []);
+  }, [src, videoKey]);
 
   return (
     <video
       ref={ref}
-      src="/ustra-promo-9x16.mp4"
+      src={src}
       controls
       playsInline
       preload="metadata"

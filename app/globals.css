@@ -79,6 +79,8 @@
 .adm-funnel-note{margin:20px 0 0;font-size:14px;color:var(--a-muted)}
 .adm-funnel-note strong{color:var(--a-text)}
 @media(max-width:760px){.adm-funnel-row{grid-template-columns:1fr;gap:8px}.adm-funnel-num{text-align:left}}
+.promo-pair{display:flex;flex-wrap:wrap;justify-content:center;gap:28px}
+.promo-pair>video{flex:0 1 340px;width:340px;max-width:100%;margin:0}
 @media(max-width:760px){.adm-stats-4{grid-template-columns:1fr 1fr}.adm-stats-4 .adm-stat:last-child{grid-column:auto}.adm-split{grid-template-columns:1fr}.adm-video-body{padding:8px 18px 20px}.adm-video-head{padding:20px 18px 0}}
 
 

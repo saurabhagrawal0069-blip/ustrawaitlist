@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import AdminLogin from './AdminLogin';
 import AdminDashboard, { type BusinessRow, type CustomerRow } from './AdminDashboard';
 import { ADMIN_COOKIE, adminSessionValue, safeEqual } from '@/lib/adminAuth';
-import { summarizeVideoViews, type VideoViewRow } from '@/lib/videoStats';
+import { splitVideoRows, summarizeVideoViews, type VideoViewRow } from '@/lib/videoStats';
 import VideoInsights from './VideoInsights';
 import FunnelInsights from './FunnelInsights';
 import { summarizeFunnel, type FunnelRow } from '@/lib/funnel';
@@ -126,10 +126,14 @@ export default async function AdminPage() {
     <FunnelInsights summary={summarizeFunnel((funnelRes.data ?? []) as FunnelRow[])} />
   );
 
+  const { narrated, short } = splitVideoRows((videoRes.data ?? []) as VideoViewRow[]);
   const videoPanel = videoRes.error ? (
     <p className="adm-error">Could not load video data: {videoRes.error.message}</p>
   ) : (
-    <VideoInsights stats={summarizeVideoViews((videoRes.data ?? []) as VideoViewRow[])} />
+    <>
+      <VideoInsights title="Narrated promo" stats={summarizeVideoViews(narrated)} />
+      <VideoInsights title="Short film" stats={summarizeVideoViews(short)} />
+    </>
   );
 
   const insights = (

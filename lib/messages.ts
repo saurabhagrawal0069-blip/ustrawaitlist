@@ -201,6 +201,16 @@ const en = {
   'success.note': "We'll send your confirmation to your email and WhatsApp, where delivery is enabled.",
   'success.back': 'BACK TO USTRA',
 
+  // Share buttons
+  'share.heading': 'Share USTRA with friends',
+  'share.hint': 'Let people near you know about early access.',
+  'share.message': 'Join the USTRA early access waitlist: your style, your barber.',
+  'share.subject': 'USTRA early access',
+  'share.copy': 'Copy link',
+  'share.copied': 'Link copied!',
+  'share.copy.failed': 'Could not copy. Please copy the link from the address bar.',
+  'share.instagram.hint': 'Link copied. Paste it in your Instagram story or message.',
+
   // Messages returned by the server (matched by their English text, see SERVER_ERROR_KEYS)
   'server.required': 'Please complete all required fields.',
   'server.phone': 'Please enter a valid mobile number with country code.',
@@ -394,6 +404,14 @@ const hi: Record<MessageKey, string> = {
   'success.position': 'रजिस्ट्रेशन क्रम',
   'success.note': 'आपकी पुष्टि ईमेल और WhatsApp पर भेजी जाएगी, जहाँ यह सुविधा चालू है।',
   'success.back': 'USTRA पर वापस जाएँ',
+  'share.heading': 'दोस्तों के साथ USTRA शेयर करें',
+  'share.hint': 'अपने आसपास के लोगों को शुरुआती पहुँच के बारे में बताएँ।',
+  'share.message': 'USTRA की शुरुआती पहुँच वेटलिस्ट से जुड़ें: आपका स्टाइल, आपका बार्बर।',
+  'share.subject': 'USTRA शुरुआती पहुँच',
+  'share.copy': 'लिंक कॉपी करें',
+  'share.copied': 'लिंक कॉपी हो गया!',
+  'share.copy.failed': 'कॉपी नहीं हो सका। कृपया ब्राउज़र के एड्रेस बार से लिंक कॉपी करें।',
+  'share.instagram.hint': 'लिंक कॉपी हो गया। इसे अपनी Instagram स्टोरी या मैसेज में पेस्ट करें।',
   'server.required': 'कृपया सभी ज़रूरी जानकारी भरें।',
   'server.phone': 'कृपया देश कोड के साथ सही मोबाइल नंबर दर्ज करें।',
   'server.email': 'कृपया सही ईमेल पता दर्ज करें।',

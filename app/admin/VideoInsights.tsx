@@ -83,7 +83,7 @@ export default function VideoInsights({ stats, title = 'Promo video' }: { stats:
       ) : (
         <div className="adm-video-body">
           <div className="adm-stats adm-stats-4">
-            <Stat label="Visits that played" value={stats.visits} />
+            <Stat label={`Devices that played (${stats.visits} visits)`} value={stats.uniqueDevices} />
             <Stat label="Avg. time watched" value={seconds(stats.avgWatched)} />
             <Stat label="Watched to the end" value={`${stats.completionRate}%`} />
             <Stat label="Avg. share of video" value={stats.avgPercent === null ? '—' : `${stats.avgPercent}%`} />
@@ -116,6 +116,7 @@ export default function VideoInsights({ stats, title = 'Promo video' }: { stats:
               <thead>
                 <tr>
                   <th>When</th>
+                  <th>Browser ID</th>
                   <th>Country</th>
                   <th>Device</th>
                   <th>Plays</th>
@@ -128,6 +129,7 @@ export default function VideoInsights({ stats, title = 'Promo video' }: { stats:
                 {stats.recent.map((visit, i) => (
                   <tr key={`${visit.firstSeen}-${i}`}>
                     <td className="adm-muted">{when(visit.firstSeen)}</td>
+                    <td><code>{visit.browser}</code></td>
                     <td>{countryName(visit.country)}</td>
                     <td>{deviceName(visit.device)}</td>
                     <td>{visit.plays}</td>

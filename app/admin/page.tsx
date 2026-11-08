@@ -86,7 +86,7 @@ export default async function AdminPage() {
       .order('waitlist_number', { ascending: true }),
     supabase
       .from('video_views')
-      .select('visit_id, first_seen, last_seen, plays, watched_seconds, max_position, video_duration, country, device')
+      .select('visit_id, visitor_id, first_seen, last_seen, plays, watched_seconds, max_position, video_duration, country, device')
       .order('first_seen', { ascending: false })
       .limit(1000),
     supabase.rpc('funnel_counts'),

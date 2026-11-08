@@ -2,13 +2,13 @@ import type { FunnelSummary } from '@/lib/funnel';
 
 /** Admin view of the visitor funnel: landed, played the video, opened the form, submitted it. */
 export default function FunnelInsights({ summary }: { summary: FunnelSummary }) {
-  const visitors = summary.steps[0]?.count ?? 0;
+  const visitors = summary.steps[0]?.count ?? 0; // devices that landed on the page
   return (
     <section className="adm-panel" aria-labelledby="funnel-title">
       <div className="adm-video-head">
         <h2 id="funnel-title">Visitor funnel</h2>
         <p className="adm-muted">
-          Each visitor counts once per step, even if they repeat it. Share is of everyone who landed on the page. Registered visitors are listed separately below.
+          Counts are devices: each phone or browser counts once per step, even if it reopens the page. The visits line under each step counts every page load. Share is of all devices that landed on the page. Registered visitors are listed separately below.
         </p>
       </div>
 
@@ -21,6 +21,7 @@ export default function FunnelInsights({ summary }: { summary: FunnelSummary }) 
               <div className="adm-funnel-row" key={step.label}>
                 <div>
                   <div>{step.label}</div>
+                  <div className="adm-muted adm-funnel-sub">{step.visits} visits</div>
                   {step.breakdown.length > 0 && (
                     <div className="adm-muted adm-funnel-sub">
                       {step.breakdown.map((b) => `${b.label}: ${b.count}`).join('  ·  ')}

@@ -3,6 +3,7 @@
 
 export type VideoViewRow = {
   visit_id: string;
+  visitor_id: string | null; // one per browser. Null for visits from before it was recorded.
   first_seen: string;
   last_seen: string;
   plays: number | string | null;
@@ -17,6 +18,7 @@ export type DropOffPoint = { second: number; reached: number; percent: number };
 
 export type RecentVisit = {
   firstSeen: string;
+  browser: string; // short form of the browser id. The same id on two visits means the same phone or browser.
   country: string;
   device: string;
   plays: number;
@@ -27,6 +29,8 @@ export type RecentVisit = {
 
 export type VideoStats = {
   visits: number;
+  uniqueDevices: number; // different phones or browsers that played it
+
   avgWatched: number;
   duration: number | null;
   completionRate: number;
@@ -54,6 +58,8 @@ function tally(values: string[]): [string, number][] {
 /** `rows` should be newest first, which is how the admin query returns them. */
 export function summarizeVideoViews(rows: VideoViewRow[]): VideoStats {
   const visits = rows.length;
+  // Each browser counts once. Visits with no browser id count as their own device.
+  const uniqueDevices = new Set(rows.map((r) => r.visitor_id ?? r.visit_id)).size;
 
   // Every visit watches the same video, so use the longest length reported.
   const lengths = rows.map((r) => toNumber(r.video_duration)).filter((d) => d > 0);
@@ -85,6 +91,7 @@ export function summarizeVideoViews(rows: VideoViewRow[]): VideoStats {
 
   return {
     visits,
+    uniqueDevices,
     avgWatched,
     duration,
     completionRate,
@@ -94,6 +101,7 @@ export function summarizeVideoViews(rows: VideoViewRow[]): VideoStats {
     devices: tally(rows.map((r) => r.device || 'Unknown')),
     recent: rows.slice(0, 25).map((r) => ({
       firstSeen: r.first_seen,
+      browser: r.visitor_id ? r.visitor_id.slice(0, 8) : '—',
       country: r.country || 'Unknown',
       device: r.device || 'Unknown',
       plays: toNumber(r.plays),

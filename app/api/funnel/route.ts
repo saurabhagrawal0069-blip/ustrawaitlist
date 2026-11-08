@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { countryFromHeader, sendVisitAlert } from '@/lib/visitAlert';
 
 export const runtime = 'nodejs';
 
@@ -22,6 +23,18 @@ export async function POST(request: Request) {
   }
 
   const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
+
+  // A device is one browser. Check before recording, so this page load can be told apart from earlier ones.
+  let newDevice = false;
+  if (stage === 'view' && visitorId) {
+    const { count } = await supabase
+      .from('funnel_events')
+      .select('id', { count: 'exact', head: true })
+      .eq('visitor_id', visitorId)
+      .eq('stage', 'view');
+    newDevice = (count ?? 0) === 0;
+  }
+
   // The database keeps one row per visit, step and kind, so repeats are ignored.
   const { error } = await supabase.rpc('record_funnel_event', {
     _visit_id: visitId,
@@ -30,5 +43,19 @@ export async function POST(request: Request) {
     _visitor_id: visitorId,
   });
   if (error) return NextResponse.json({ ok: false }, { status: 500 });
+
+  // The visitor's page is already done. A failed alert must not affect it.
+  if (newDevice) {
+    try {
+      await sendVisitAlert({
+        country: countryFromHeader(request.headers.get('cf-ipcountry')),
+        userAgent: request.headers.get('user-agent'),
+        when: new Date(),
+      });
+    } catch (err) {
+      console.error('visit alert failed', err);
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }

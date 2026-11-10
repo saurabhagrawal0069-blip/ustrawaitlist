@@ -9,10 +9,12 @@ import BookingAnimation from '@/components/BookingAnimation';
 export default function Home() {
   const [kind, setKind] = useState<'customer'|'business'|null>(null);
 
-  // Direct links such as /?join=customer or /?join=business open the form straight away.
+  // One shareable link: /?join opens the form straight away, with the customer and
+  // barber/business switch at the top. /?join=business opens the business side first.
   useEffect(() => {
-    const join = new URLSearchParams(window.location.search).get('join');
-    if (join === 'customer' || join === 'business') setKind(join);
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('join')) return;
+    setKind(params.get('join') === 'business' ? 'business' : 'customer');
   }, []);
 
   return <main>

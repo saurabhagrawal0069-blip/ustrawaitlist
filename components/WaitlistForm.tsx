@@ -5,7 +5,7 @@ import { ArrowRight, CheckCircle2, LoaderCircle } from 'lucide-react';
 
 type Kind = 'customer' | 'business';
 
-export default function WaitlistForm({ kind, onClose }: { kind: Kind; onClose: () => void }) {
+export default function WaitlistForm({ kind, onClose, onKindChange }: { kind: Kind; onClose: () => void; onKindChange?: (kind: Kind) => void }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ id: string; position: number } | null>(null);
   const [error, setError] = useState('');
@@ -28,6 +28,10 @@ export default function WaitlistForm({ kind, onClose }: { kind: Kind; onClose: (
   if (done) return <div className="success-panel"><div className="success-icon"><CheckCircle2 size={42}/></div><p className="eyebrow">YOU&apos;RE ON THE LIST</p><h2>Welcome to the <em>USTRA</em> family.</h2><p>Your {isBusiness ? 'business' : 'customer'} registration has been received.</p><div className="ticket"><span>YOUR WAITLIST ID</span><strong>{done.id}</strong><span>Registration position</span><strong>#{done.position}</strong></div><p className="muted small">We&apos;ll send your confirmation to your email and WhatsApp, where delivery is enabled.</p><button className="button button-gold full" onClick={onClose}>BACK TO USTRA</button></div>;
 
   return <form className="waitlist-form" onSubmit={submit}>
+    {onKindChange && <div className="role-switch" role="tablist" aria-label="How are you joining?">
+      <button type="button" role="tab" aria-selected={!isBusiness} className={`role-option ${!isBusiness ? 'active' : ''}`} onClick={() => onKindChange('customer')}>I AM A CUSTOMER</button>
+      <button type="button" role="tab" aria-selected={isBusiness} className={`role-option ${isBusiness ? 'active' : ''}`} onClick={() => onKindChange('business')}>I AM A BARBER / BUSINESS</button>
+    </div>}
     <div className="form-heading"><p className="eyebrow">{isBusiness ? 'USTRA BUSINESS CLUB' : 'THE INNER CIRCLE'}</p><h2>{isBusiness ? 'Put your business' : 'Get early access'} <em>{isBusiness ? 'in the spotlight.' : 'to better grooming.'}</em></h2><p className="muted">{isBusiness ? 'Join the network. Meet more local customers. Grow with USTRA.' : 'Be among the first to discover and book trusted grooming professionals near you.'}</p></div>
     <div className="field-grid"><label>Full name *<input required value={form.name} onChange={e=>update('name',e.target.value)} placeholder="Your full name" autoComplete="name"/></label><label>Mobile number *<input required type="tel" pattern="[+0-9 ()-]{8,18}" value={form.phone} onChange={e=>update('phone',e.target.value)} placeholder="+91 98765 43210" autoComplete="tel"/></label><label className="span-two">Email address<input type="email" value={form.email} onChange={e=>update('email',e.target.value)} placeholder="you@example.com" autoComplete="email"/></label>
     {isBusiness && <><label className="span-two">Business / salon name *<input required value={form.businessName} onChange={e=>update('businessName',e.target.value)} placeholder="Your business name"/></label><label>Business type<select value={form.businessType} onChange={e=>update('businessType',e.target.value)}><option>Barber Shop</option><option>Premium Salon</option><option>Unisex Salon</option><option>Grooming Studio</option><option>Independent Barber</option></select></label></>}

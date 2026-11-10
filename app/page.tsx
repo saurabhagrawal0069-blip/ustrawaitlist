@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowRight, Crown, MapPin, Scissors, ShieldCheck, Sparkles, Store, UserRound, X } from 'lucide-react';
 import WaitlistForm from '@/components/WaitlistForm';
 import OfferBanner from '@/components/OfferBanner';
@@ -8,6 +8,13 @@ import BookingAnimation from '@/components/BookingAnimation';
 
 export default function Home() {
   const [kind, setKind] = useState<'customer'|'business'|null>(null);
+
+  // Direct links such as /?join=customer or /?join=business open the form straight away.
+  useEffect(() => {
+    const join = new URLSearchParams(window.location.search).get('join');
+    if (join === 'customer' || join === 'business') setKind(join);
+  }, []);
+
   return <main>
     <nav className="nav wrap"><a className="brand" href="#home"><span className="brand-mark"><Crown size={22}/></span><span>USTRA<small>YOUR STYLE. OUR PRIORITY.</small></span></a><div className="nav-links"><a href="#why">WHY USTRA</a><a href="#how">HOW IT WORKS</a><a href="#business">FOR BUSINESSES</a></div><button className="button button-outline nav-cta" onClick={()=>setKind('customer')}>JOIN WAITLIST <ArrowRight size={15}/></button></nav>
     <section className="hero" id="home"><div className="hero-lines"/><div className="hero-content wrap"><div className="hero-copy"><p className="eyebrow"><span className="live-dot"/> THE FUTURE OF LOCAL GROOMING</p><h1>Your style.<br/><em>Your barber.</em><br/>Your USTRA.</h1><p className="hero-sub">Discover trusted grooming professionals around you. Book smarter, look sharper, and make every appointment count.</p><div className="hero-actions"><button className="button button-gold" onClick={()=>setKind('customer')}>JOIN AS CUSTOMER <ArrowRight size={18}/></button><button className="button button-outline" onClick={()=>setKind('business')}>JOIN AS BUSINESS <Store size={17}/></button></div><div className="hero-proof"><span><ShieldCheck size={16}/> Early access</span><span><Sparkles size={16}/> Launch privileges</span><span><MapPin size={16}/> Local-first</span></div></div><div className="hero-art"><div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/><div className="art-card"><div className="art-crown"><Crown size={48}/></div><div className="art-beard">✦</div><div className="art-word">USTRA</div><div className="art-rule"/><p>LOOK GOOD.<br/>FEEL BETTER.</p><span>GROOMING, REIMAGINED.</span></div><div className="floating-tag tag-top"><Scissors size={15}/> YOUR NEXT LOOK</div><div className="floating-tag tag-bottom"><span className="live-dot"/> EARLY ACCESS OPEN</div></div></div><a href="#why" className="scroll-cue"><ArrowDown size={16}/> DISCOVER USTRA</a></section>
@@ -19,6 +26,6 @@ export default function Home() {
     <section className="business-band" id="business"><div className="wrap business-inner"><div><p className="eyebrow">FOR BARBERS & SALON OWNERS</p><h2>Your craft deserves<br/><em>a bigger audience.</em></h2><p className="muted">Bring your business into the local discovery era. Join USTRA's early partner network and get ready to grow your reach.</p><ul><li>Get discovered by local customers</li><li>Build your digital business presence</li><li>Prepare for easier appointment management</li></ul><button className="button button-gold" onClick={()=>setKind('business')}>JOIN AS BUSINESS <ArrowRight size={18}/></button></div><div className="business-stamp"><Crown size={46}/><strong>USTRA</strong><span>FOUNDING PARTNER<br/>NETWORK</span><i>✦</i></div></div></section>
     <section className="section wrap how-section" id="how"><div className="section-intro centered"><p className="eyebrow">YOUR USTRA JOURNEY</p><h2>Three steps to <em>get started.</em></h2></div><div className="steps"><div><b>01</b><h3>Choose your side</h3><p>Join as a customer or a grooming business.</p></div><div><b>02</b><h3>Save your spot</h3><p>Share a few details to join the early access list.</p></div><div><b>03</b><h3>Stay in the loop</h3><p>Get your confirmation and launch updates by email or WhatsApp.</p></div></div><div className="final-cta"><p className="eyebrow">THE USTRA COMMUNITY STARTS HERE</p><h2>Be there from <em>the beginning.</em></h2><button className="button button-gold" onClick={()=>setKind('customer')}>CLAIM YOUR EARLY ACCESS <ArrowRight size={18}/></button></div></section>
     <footer className="footer"><div className="wrap footer-inner"><a className="brand" href="#home"><span className="brand-mark"><Crown size={22}/></span><span>USTRA<small>YOUR STYLE. OUR PRIORITY.</small></span></a><p>© {new Date().getFullYear()} USTRA. All rights reserved.</p><span>MADE FOR THE WAY YOU LOOK.</span></div></footer>
-    {kind && <div className="modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setKind(null)}}><div className="modal" role="dialog" aria-modal="true"><button className="modal-close" onClick={()=>setKind(null)} aria-label="Close"><X/></button><WaitlistForm kind={kind} onClose={()=>setKind(null)}/></div></div>}
+    {kind && <div className="modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setKind(null)}}><div className="modal" role="dialog" aria-modal="true"><button className="modal-close" onClick={()=>setKind(null)} aria-label="Close"><X/></button><WaitlistForm kind={kind} onClose={()=>setKind(null)} onKindChange={setKind}/></div></div>}
   </main>;
 }

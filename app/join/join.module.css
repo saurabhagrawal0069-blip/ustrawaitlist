@@ -1,0 +1,45 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+  background: #090909;
+}
+
+.card {
+  width: min(650px, 100%);
+  background: #10100f;
+  border: 1px solid #a87a20;
+  box-shadow: 0 25px 100px #000;
+  padding: 38px;
+}
+
+.switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 0 28px;
+  border: 1px solid #77602d;
+}
+
+.option {
+  background: transparent;
+  border: 0;
+  color: #cfc4b0;
+  padding: 14px 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+}
+
+.active {
+  background: #f2b51f;
+  color: #111;
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 30px 20px;
+  }
+}

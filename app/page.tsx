@@ -17,9 +17,11 @@ const TICKER_HI = messages.hi.ticker.split('|');
 const TICKER = TICKER_EN.map((word, i) => `${word} · ${TICKER_HI[i]}`);
 
 export default function Home() {
-  const [kind, setKind] = useState<'customer'|'business'|null>(null);
+  const [kind, setKind] = useState<'customer'|'business'|'choose'|null>(null);
   useEffect(() => { trackStep('view'); }, []);
-  useEffect(() => { if (kind) trackStep('join', kind); }, [kind]);
+  // The one link (…/?join) opens the form straight away, with the role picker at the top.
+  useEffect(() => { if (new URLSearchParams(window.location.search).has('join')) setKind('choose'); }, []);
+  useEffect(() => { if (kind && kind !== 'choose') trackStep('join', kind); }, [kind]);
   const year = new Date().getFullYear();
 
   return <main>
@@ -33,6 +35,6 @@ export default function Home() {
     <section className="business-band" id="business"><div className="wrap business-inner"><div><p className="eyebrow"><Bi k="biz.eyebrow"/></p><h2><Bi k="biz.title1"/><br/><em><Bi k="biz.title2"/></em></h2><p className="muted"><Bi k="biz.body"/></p><ul><li><Bi k="biz.point.1"/></li><li><Bi k="biz.point.2"/></li><li><Bi k="biz.point.3"/></li></ul><button className="button button-gold" onClick={()=>setKind('business')}><Bi k="hero.business" inline/> <ArrowRight size={18}/></button></div><div className="business-stamp"><Crown size={46}/><strong>USTRA</strong><span><Bi k="biz.stamp1"/><br/><Bi k="biz.stamp2"/></span><i>✦</i></div></div></section>
     <section className="section wrap how-section" id="how"><div className="section-intro centered"><p className="eyebrow"><Bi k="how.eyebrow"/></p><h2><Bi k="how.title1"/> <em><Bi k="how.title2"/></em></h2></div><div className="steps"><div><b>01</b><h3><Bi k="step.1.title"/></h3><p><Bi k="step.1.text"/></p></div><div><b>02</b><h3><Bi k="step.2.title"/></h3><p><Bi k="step.2.text"/></p></div><div><b>03</b><h3><Bi k="step.3.title"/></h3><p><Bi k="step.3.text"/></p></div></div><div className="final-cta"><p className="eyebrow"><Bi k="final.eyebrow"/></p><h2><Bi k="final.title1"/> <em><Bi k="final.title2"/></em></h2><button className="button button-gold" onClick={()=>setKind('customer')}><Bi k="final.cta" inline/> <ArrowRight size={18}/></button></div></section>
     <footer className="footer"><div className="wrap footer-inner"><a className="brand" href="#home"><span className="brand-mark"><Crown size={22}/></span><span>USTRA<small><Bi k="brand.tagline"/></small></span></a><p><Bi k="footer.copy" params={{ year }}/></p><span><Bi k="footer.tagline"/></span></div></footer>
-    {kind && <div className="modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setKind(null)}}><div className="modal" role="dialog" aria-modal="true"><button className="modal-close" onClick={()=>setKind(null)} aria-label="Close"><X/></button><WaitlistForm kind={kind} onClose={()=>setKind(null)}/></div></div>}
+    {kind && <div className="modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setKind(null)}}><div className="modal" role="dialog" aria-modal="true"><button className="modal-close" onClick={()=>setKind(null)} aria-label="Close"><X/></button><WaitlistForm kind={kind} onPick={setKind} onClose={()=>setKind(null)}/></div></div>}
   </main>;
 }

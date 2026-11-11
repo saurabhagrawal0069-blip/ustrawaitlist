@@ -133,3 +133,9 @@
 @media(max-width:800px){.booking-film{padding:75px 0}.booking-film-inner{grid-template-columns:1fr;gap:20px}.booking-film-copy{max-width:620px}.booking-film-visual{min-height:470px}.film-floating-note{right:0}}
 @media(max-width:520px){.booking-film-copy h2{font-size:52px}.booking-film-visual{min-height:430px}.film-phone{width:min(315px,84%)}.film-floating-note{right:-4px;bottom:55px;padding:9px}.film-progress{bottom:0}}
 @media(prefers-reduced-motion:reduce){.film-phone,.film-glow,.map-pin,.film-floating-note{animation:none}.film-listing{animation:none}}
+
+/* Role picker at the top of the waitlist form (also the one-link ?join entry). */
+.role-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 22px}
+.role-option{border:1px solid #554321;background:transparent;color:#cfc4b0;padding:14px 10px;font-family:inherit;font-weight:700;font-size:13px;line-height:1.2;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.role-option:hover,.role-option.selected{background:var(--gold);color:#111;border-color:var(--gold)}
+@media(max-width:520px){.role-picker{grid-template-columns:1fr}}

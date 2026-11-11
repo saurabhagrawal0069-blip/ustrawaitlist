@@ -29,7 +29,7 @@ const SERVICES: [string, MessageKey][] = [
 // 'choose' is the one-link entry (?join): only the role picker shows until a role is picked.
 type Choice = Kind | 'choose';
 
-export default function WaitlistForm({ kind, onPick, onClose }: { kind: Choice; onPick: (k: Kind) => void; onClose: () => void }) {
+export default function WaitlistForm({ kind, onPick, onClose }: { kind: Choice; onPick?: (k: Kind) => void; onClose: () => void }) {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ id: string; position: number } | null>(null);
   const [error, setError] = useState('');
@@ -57,9 +57,10 @@ export default function WaitlistForm({ kind, onPick, onClose }: { kind: Choice; 
   if (done) return <div className="success-panel"><div className="success-icon"><CheckCircle2 size={42}/></div><p className="eyebrow"><Bi k="success.eyebrow"/></p><h2><Bi k="success.title1"/> <em><Bi k="success.title2"/></em></h2><p><Bi k={isBusiness ? 'success.business' : 'success.customer'}/></p><div className="ticket"><span><Bi k="success.id" inline/></span><strong>{done.id}</strong><span><Bi k="success.position" inline/></span><strong>#{done.position}</strong></div><p className="muted small"><Bi k="success.note"/></p><button className="button button-gold full" onClick={onClose}><Bi k="success.back" inline/></button></div>;
 
   // The two role options sit at the top of the form, always. Picking one shows the fields for it.
-  const picker = <div className="role-picker" role="group" aria-label="Choose who you are">
-    <button type="button" className={`role-option ${kind === 'customer' ? 'selected' : ''}`} aria-pressed={kind === 'customer'} onClick={() => onPick('customer')}>I AM A CUSTOMER</button>
-    <button type="button" className={`role-option ${kind === 'business' ? 'selected' : ''}`} aria-pressed={kind === 'business'} onClick={() => onPick('business')}>I AM A BARBER / BUSINESS</button>
+  // Shown only where the parent passes onPick (the one-link page). /join has its own switch and passes none.
+  const picker = onPick && <div className="role-picker" role="group" aria-label="Choose who you are">
+    <button type="button" className={`role-option ${kind === 'customer' ? 'selected' : ''}`} aria-pressed={kind === 'customer'} onClick={() => onPick?.('customer')}>I AM A CUSTOMER</button>
+    <button type="button" className={`role-option ${kind === 'business' ? 'selected' : ''}`} aria-pressed={kind === 'business'} onClick={() => onPick?.('business')}>I AM A BARBER / BUSINESS</button>
   </div>;
 
   if (kind === 'choose') return <div className="waitlist-form"><p className="eyebrow"><Bi k="nav.join"/></p>{picker}</div>;

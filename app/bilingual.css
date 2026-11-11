@@ -1,7 +1,7 @@
 /* The Hindi line under each English line. Both languages show on the page at the same time. */
 .hi-line {
   display: block;
-  font-size: 0.9em;
+  font-size: 1em;
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
@@ -11,16 +11,16 @@
 }
 
 /* Headings are much bigger than body text, so their Hindi line is scaled down to match. */
-h1 .hi-line { font-size: 0.36em; }
-h2 .hi-line { font-size: 0.46em; }
-h3 .hi-line { font-size: 0.86em; }
+h1 .hi-line { font-size: 0.42em; }
+h2 .hi-line { font-size: 0.52em; }
+h3 .hi-line { font-size: 0.95em; }
 
 /* A line break that follows a Hindi line would add an empty line, so it is hidden. */
 .hi-line + br { display: none; }
 
 /* Hindi that sits on the same line as the English, inside buttons and chips. */
 .hi-inline {
-  font-size: 1.08em;
+  font-size: 1.12em;
   letter-spacing: 0;
   text-transform: none;
   font-weight: 500;
